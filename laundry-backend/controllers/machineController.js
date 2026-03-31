@@ -1,13 +1,24 @@
-const db = require('../config/db');
+const supabase = require('../config/supabase');
 
 const getMachinery = async (req, res) => {
     try {
-        const [machines] = await db.execute(`
-            SELECT m.*, o.customer_name as assigned_customer
-            FROM machinery m
-            LEFT JOIN orders o ON m.assigned_order_id = o.id
-            ORDER BY m.type, m.name
-        `);
+        const { data: machinesData, error } = await supabase
+            .from('machinery')
+            .select(`
+                *,
+                orders (customer_name)
+            `)
+            .order('type', { ascending: true })
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        // Map it to match the sqlite shape that the frontend expects
+        const machines = machinesData.map(m => ({
+            ...m,
+            assigned_customer: m.orders ? m.orders.customer_name : null
+        }));
+
         res.json(machines);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -23,25 +34,37 @@ const startMachine = async (req, res) => {
     const endTime = new Date(Date.now() + durationMs).toISOString();
 
     try {
-        await db.execute(`
-            UPDATE machinery 
-            SET assigned_order_id = ?, 
-                cycle_start_time = ?, 
-                expected_end_time = ?,
-                status = 'Running',
-                usage_count = usage_count + 1
-            WHERE id = ?
-        `, [order_id, startTime, endTime, machine_id]);
+        // 1. Fetch current usage count
+        const { data: currentMachine } = await supabase
+            .from('machinery')
+            .select('usage_count, type')
+            .eq('id', machine_id)
+            .single();
+
+        // 2. Update Machine
+        const { error: updateError } = await supabase
+            .from('machinery')
+            .update({
+                assigned_order_id: order_id,
+                cycle_start_time: startTime,
+                expected_end_time: endTime,
+                status: 'Running',
+                usage_count: (currentMachine?.usage_count || 0) + 1
+            })
+            .eq('id', machine_id);
+
+        if (updateError) throw updateError;
 
         const io = req.app.get('io');
         io.emit('machine_update', { machine_id, status: 'Running' });
 
-        // Auto-update order status
-        const [machines] = await db.execute('SELECT type FROM machinery WHERE id = ?', [machine_id]);
-        if (machines.length > 0) {
-            const newStatus = machines[0].type.includes('Washing') ? 'Washing' : 'Drying';
-            await db.execute('UPDATE orders SET status = ? WHERE id = ?', [newStatus, order_id]);
-            await db.execute('INSERT INTO order_updates (order_id, status) VALUES (?, ?)', [order_id, newStatus]);
+        // 3. Auto-update order status
+        if (currentMachine) {
+            const newStatus = currentMachine.type.includes('Washing') ? 'Washing' : 'Drying';
+            
+            await supabase.from('orders').update({ status: newStatus }).eq('id', order_id);
+            await supabase.from('order_updates').insert({ order_id, status: newStatus });
+            
             io.emit('status_update', { order_id, new_status: newStatus });
         }
 
@@ -54,25 +77,38 @@ const startMachine = async (req, res) => {
 const stopMachine = async (req, res) => {
     const { machine_id } = req.params;
     try {
-        const [machines] = await db.execute('SELECT assigned_order_id, type FROM machinery WHERE id = ?', [machine_id]);
-        const order_id = machines.length > 0 ? machines[0].assigned_order_id : null;
+        const { data: currentMachine, error: fetchErr } = await supabase
+            .from('machinery')
+            .select('assigned_order_id, type')
+            .eq('id', machine_id)
+            .single();
 
-        await db.execute(`
-            UPDATE machinery 
-            SET assigned_order_id = NULL, 
-                cycle_start_time = NULL, 
-                expected_end_time = NULL,
-                status = 'Operational'
-            WHERE id = ?
-        `, [machine_id]);
+        if (fetchErr) throw fetchErr;
+
+        const order_id = currentMachine?.assigned_order_id;
+
+        // Update Machine
+        const { error: updateErr } = await supabase
+            .from('machinery')
+            .update({
+                assigned_order_id: null,
+                cycle_start_time: null,
+                expected_end_time: null,
+                status: 'Operational'
+            })
+            .eq('id', machine_id);
+
+        if (updateErr) throw updateErr;
 
         const io = req.app.get('io');
         io.emit('machine_update', { machine_id, status: 'Operational' });
 
         if (order_id) {
-            const nextStatus = machines[0].type.includes('Washing') ? 'Drying' : 'Ironing';
-            await db.execute('UPDATE orders SET status = ? WHERE id = ?', [nextStatus, order_id]);
-            await db.execute('INSERT INTO order_updates (order_id, status) VALUES (?, ?)', [order_id, nextStatus]);
+            const nextStatus = currentMachine.type.includes('Washing') ? 'Drying' : 'Ironing';
+            
+            await supabase.from('orders').update({ status: nextStatus }).eq('id', order_id);
+            await supabase.from('order_updates').insert({ order_id, status: nextStatus });
+            
             io.emit('status_update', { order_id, new_status: nextStatus });
         }
 

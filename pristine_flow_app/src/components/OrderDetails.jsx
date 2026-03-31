@@ -110,16 +110,26 @@ export default function OrderDetails() {
             <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
             {user ? "Return to Command Center" : "Back to Home"}
           </Link>
-          <button 
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              toast.success('Tracking link copied!');
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
-          >
-            <span className="material-symbols-outlined text-sm">content_copy</span>
-            Copy Link
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsInvoiceOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#8ff5ff]/10 text-[#8ff5ff] border border-[#8ff5ff]/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#8ff5ff] hover:text-black transition-all shadow-[0_0_15px_rgba(143,245,255,0.1)]"
+            >
+              <span className="material-symbols-outlined text-sm">receipt_long</span>
+              Invoice Protocol
+            </button>
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('Tracking link copied!');
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">content_copy</span>
+              Copy Link
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -205,13 +215,6 @@ export default function OrderDetails() {
                     <span className="material-symbols-outlined text-[#8ff5ff] text-base">settings</span>
                     Operational Controls
                   </h2>
-                  <button 
-                    onClick={() => setIsInvoiceOpen(true)}
-                    className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#8ff5ff] hover:text-black transition-all flex items-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-sm">receipt_long</span>
-                    Invoice
-                  </button>
                 </div>
                 <div className="flex flex-wrap gap-3">
                    {STAGES.map((s, idx) => (

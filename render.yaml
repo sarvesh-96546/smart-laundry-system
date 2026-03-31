@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pristine-flow-backend
+    env: node
+    plan: free
+    rootDir: laundry-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: SUPABASE_URL
+        sync: false # You will need to paste your Supabase URL manually in the Render dashboard during setup
+      - key: SUPABASE_ANON_KEY
+        sync: false # You will need to paste your Supabase Anon Key manually in the Render dashboard
+      - key: RESEND_API_KEY
+        sync: false # You will need to paste your Resend API Key manually in the Render dashboard
+      - key: FRONTEND_URL
+        sync: false # Set this to your Vercel URL once deployed to allow CORS

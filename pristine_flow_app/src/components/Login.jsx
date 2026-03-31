@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
   const [email, setEmail] = useState('admin@gmail.com');
@@ -8,6 +9,17 @@ export default function Login() {
   const [error, setError] = useState('');
   const { login } = useApp();
   const navigate = useNavigate();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,7 +103,27 @@ export default function Login() {
               </div>
             </form>
 
-            <div className="mt-8 pt-8 border-t border-white/5 text-center">
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/10"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-[#121212] text-slate-500">Or bypass via</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={handleGoogleLogin}
+                type="button" 
+                className="mt-6 w-full bg-white hover:bg-slate-100 text-black font-semibold py-4 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-3"
+              >
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                Continue with Google Node
+              </button>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-white/5 text-center">
               <p className="text-sm text-slate-500">
                 Unauthorized access is logged. <a href="#" className="text-[#8ff5ff] hover:underline font-medium">Request ID</a>
               </p>

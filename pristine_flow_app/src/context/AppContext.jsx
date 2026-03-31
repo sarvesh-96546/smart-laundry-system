@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
+import { supabase } from '../lib/supabase';
 
 const AppContext = createContext();
 
@@ -19,7 +20,7 @@ export const AppProvider = ({ children }) => {
     chart_data: []
   });
 
-  const API_BASE_URL = 'http://localhost:5002';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
   const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
@@ -164,11 +165,45 @@ export const AppProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('token');
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-    }
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        // Map supabase user to our local user structure
+        const formattedUser = {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          // Supabase users will default to customer unless we assign it differently in DB
+          role: 'customer' 
+        };
+        setUser(formattedUser);
+        localStorage.setItem('token', session.access_token);
+      }
+    });
+
+    // Listen to Auth State changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+         const formattedUser = {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          role: 'customer'
+        };
+        setUser(formattedUser);
+        localStorage.setItem('token', session.access_token);
+        
+        // If login successful from OAuth, let's toast!
+        if (_event === 'SIGNED_IN') {
+           toast.success(`Welcome, ${formattedUser.name}! Secure connection established.`);
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem('token');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email, password) => {
@@ -195,11 +230,12 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    toast.success('Logged out successfully');
+    toast.success('System disconnected cleanly');
   };
 
   const createOrder = async (orderData) => {

@@ -1,23 +1,24 @@
-const db = require('../config/db');
+const supabase = require('../config/supabase');
 
 const getStats = async (req, res) => {
     try {
-        const [orders] = await db.execute('SELECT * FROM orders');
+        const { data: orders, error } = await supabase.from('orders').select('*');
+        if (error) throw error;
         
         let totalRevenue = 0;
         let inProgress = 0;
         let ready = 0;
 
         orders.forEach(o => {
-            if (o.payment_status === 'Paid') totalRevenue += o.amount;
+            if (o.payment_status === 'Paid') totalRevenue += Number(o.amount);
             if (o.status !== 'Delivered' && o.status !== 'Ready') inProgress++;
             if (o.status === 'Ready') ready++;
         });
 
-        // Group by date for chart
+        // Group by date for chart (handle timezone strings correctly)
         const chartDataMap = {};
         orders.forEach(o => {
-            const date = o.created_at.split(' ')[0];
+            const date = new Date(o.created_at).toISOString().split('T')[0];
             chartDataMap[date] = (chartDataMap[date] || 0) + 1;
         });
 

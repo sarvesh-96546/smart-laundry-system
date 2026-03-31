@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+import html2pdf from 'html2pdf.js';
 
 export default function InvoiceModal({ isOpen, onClose, order }) {
+  const [downloading, setDownloading] = useState(false);
+
   if (!isOpen || !order) return null;
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownload = () => {
+    setDownloading(true);
+    const element = document.getElementById('printable-invoice');
+    const opt = {
+      margin:       0.5,
+      filename:     `Invoice-${order.id}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().from(element).set(opt).save().then(() => setDownloading(false));
   };
 
   return (
@@ -18,9 +30,11 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                 Invoice Preview
             </h2>
             <div className="flex gap-2">
-                <button onClick={handlePrint} className="px-4 py-2 bg-[#8ff5ff] text-black font-bold rounded-xl text-xs flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">print</span>
-                    Print
+                <button onClick={handleDownload} disabled={downloading} className={`px-4 py-2 text-black font-bold rounded-xl text-xs flex items-center gap-2 transition-all ${downloading ? 'bg-slate-400 opacity-70' : 'bg-[#8ff5ff] hover:bg-[#6edbe6]'}`}>
+                    <span className="material-symbols-outlined text-sm">
+                        {downloading ? 'hourglass_empty' : 'download'}
+                    </span>
+                    {downloading ? 'Processing PDF...' : 'Download PDF'}
                 </button>
                 <button onClick={onClose} className="w-10 h-10 bg-white/5 text-white rounded-full flex items-center justify-center hover:bg-white/10">
                     <span className="material-symbols-outlined text-sm">close</span>
