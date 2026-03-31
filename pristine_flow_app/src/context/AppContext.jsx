@@ -166,15 +166,17 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     // Check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
+        // Fetch actual role from public.users table
+        const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+        
         // Map supabase user to our local user structure
         const formattedUser = {
           id: session.user.id,
           email: session.user.email,
           name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-          // Supabase users will default to customer unless we assign it differently in DB
-          role: 'customer' 
+          role: userData?.role || 'customer' 
         };
         setUser(formattedUser);
         localStorage.setItem('token', session.access_token);
@@ -182,21 +184,25 @@ export const AppProvider = ({ children }) => {
     });
 
     // Listen to Auth State changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
+         // Fetch actual role from public.users table
+         const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+
          const formattedUser = {
           id: session.user.id,
           email: session.user.email,
           name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-          role: 'customer'
+          role: userData?.role || 'customer'
         };
         setUser(formattedUser);
         localStorage.setItem('token', session.access_token);
         
         // If login successful from OAuth, let's toast!
         if (_event === 'SIGNED_IN') {
-           toast.success(`Welcome, ${formattedUser.name}! Secure connection established.`);
+           toast.success(`Welcome, ${formattedUser.name}! Access Level: ${formattedUser.role.toUpperCase()}`);
         }
+
       } else {
         setUser(null);
         localStorage.removeItem('token');
