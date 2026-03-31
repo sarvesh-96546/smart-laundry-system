@@ -1,0 +1,172 @@
+{% extends 'staff_base.html' %}
+{% block title %}Customer Network — Pristine Flow{% endblock %}
+{% block page_title %}Customer Network{% endblock %}
+
+{% block content %}
+<div class="space-y-8 fade-in">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <p class="text-[10px] font-bold text-on-surface-variant tracking-[0.2em] uppercase mb-1">Member Database</p>
+      <h2 class="text-3xl font-extrabold tracking-tight text-white">Customer Network</h2>
+    </div>
+    <div class="flex gap-3 items-center">
+      <div class="hidden sm:flex items-center bg-surface-container-highest/60 px-4 py-2.5 rounded-2xl border border-outline-variant/10">
+        <span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm">search</span>
+        <input class="bg-transparent border-none focus:ring-0 text-sm text-white w-40 placeholder:text-on-surface-variant/50 outline-none" placeholder="Filter identities..." type="text" id="customerSearch"/>
+      </div>
+      {% if session.get('role') == 'admin' %}
+      <a href="{{ url_for('staff_roles') }}" class="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-surface font-bold rounded-2xl text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(143,245,255,0.2)] hover:scale-105 transition-transform flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">person_add</span> Manage Roles
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Top Stats Row (matching Stitch Customer Network) -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Active Users -->
+    <div class="glass-panel rounded-3xl border border-outline-variant/10 p-7 relative">
+      <div class="flex justify-between items-start mb-4">
+        <div class="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary">verified_user</span>
+        </div>
+        <span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded-full">+12% Month</span>
+      </div>
+      <h3 class="text-5xl font-extrabold tracking-tight text-white mb-1">{{ users|length }}</h3>
+      <p class="text-[10px] font-bold text-on-surface-variant tracking-[0.15em] uppercase">Active Subscriptions</p>
+    </div>
+
+    <!-- Loyalty Retention -->
+    <div class="glass-panel rounded-3xl border border-outline-variant/10 p-7">
+      <div class="flex justify-between items-start mb-4">
+        <p class="text-[10px] font-bold text-on-surface-variant tracking-[0.15em] uppercase">Loyalty Retention</p>
+        <span class="material-symbols-outlined text-secondary text-xl">bar_chart</span>
+      </div>
+      <div class="flex items-end gap-2 mb-2">
+        <h3 class="text-4xl font-extrabold tracking-tight text-white">94.2%</h3>
+        <div class="w-1 h-8 bg-gradient-to-t from-secondary to-primary rounded-full mb-1"></div>
+      </div>
+      <p class="text-xs text-on-surface-variant">System-wide retention based on the last 3 billing cycles.</p>
+    </div>
+
+    <!-- Recent Additions -->
+    <div class="glass-panel rounded-3xl border border-outline-variant/10 p-7">
+      <div class="mb-4">
+        <p class="text-[10px] font-bold text-on-surface-variant tracking-[0.15em] uppercase">Recent Additions</p>
+      </div>
+      <div class="flex items-center gap-3 mb-3">
+        <div class="flex -space-x-2">
+          {% for u in users[:3] %}
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br {% if loop.index == 1 %}from-primary/60 to-secondary/60{% elif loop.index == 2 %}from-secondary/60 to-tertiary/60{% else %}from-tertiary/60 to-primary/60{% endif %} border-2 border-surface flex items-center justify-center text-sm font-bold text-white">
+            {{ u.username[0].upper() }}
+          </div>
+          {% endfor %}
+          {% if users|length > 3 %}
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-surface flex items-center justify-center text-xs font-bold text-on-surface-variant">
+            +{{ users|length - 3 }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <p class="text-xs text-on-surface-variant">New accounts verified today.</p>
+    </div>
+  </div>
+
+  <!-- Member Directory Table (matching Stitch) -->
+  <section class="glass-panel rounded-3xl border border-outline-variant/10 overflow-hidden">
+    <div class="px-8 py-5 flex justify-between items-center border-b border-outline-variant/10">
+      <h2 class="text-lg font-bold text-white">Member Directory</h2>
+      <div class="flex gap-3">
+        <button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-sm">filter_list</span>
+        </button>
+        <button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-sm">download</span>
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full" id="userTable">
+        <thead>
+          <tr class="text-[10px] font-bold text-on-surface-variant tracking-[0.15em] uppercase bg-surface-container-low">
+            <th class="px-8 py-4 text-left">Customer Identity</th>
+            <th class="px-6 py-4 text-left">Tier Status</th>
+            <th class="px-6 py-4 text-left">Last Transaction</th>
+            <th class="px-6 py-4 text-left">Loyalty Points</th>
+            <th class="px-8 py-4 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/5">
+          {% for u in users %}
+          <tr class="hover:bg-surface-container-high/40 transition-colors customer-row">
+            <td class="px-8 py-5">
+              <div class="flex items-center gap-4">
+                <div class="relative">
+                  <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/30 to-secondary/30 border border-outline-variant/20 flex items-center justify-center text-sm font-bold text-white">
+                    {{ u.username[0].upper() }}
+                  </div>
+                  <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full {% if u.role == 'admin' %}bg-primary{% else %}bg-green-400{% endif %} border-2 border-surface"></div>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-white customer-name">{{ u.username }}</p>
+                  <p class="text-[11px] text-on-surface-variant">{{ u.username }}@pristine.flow</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              {% if u.role == 'admin' %}
+              <div class="flex flex-col gap-1">
+                <span class="inline-flex px-2.5 py-1 rounded-lg bg-primary/15 text-primary border border-primary/25 text-[10px] font-bold uppercase tracking-wider">Titanium</span>
+                <span class="inline-flex px-2.5 py-1 rounded-lg bg-secondary/15 text-secondary border border-secondary/25 text-[10px] font-bold uppercase tracking-wider">Elite</span>
+              </div>
+              {% else %}
+              <span class="inline-flex px-2.5 py-1 rounded-lg bg-tertiary/10 text-tertiary border border-tertiary/20 text-[10px] font-bold uppercase tracking-wider">Staff</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-white font-medium">{{ "2025-03-01" }}</p>
+              <p class="text-[11px] text-on-surface-variant">Express Wash • ₹49.00</p>
+            </td>
+            <td class="px-6 py-5">
+              <div class="flex items-center gap-2">
+                <div class="w-16 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                  <div class="h-full {% if u.role == 'admin' %}bg-gradient-to-r from-primary to-secondary{% else %}bg-secondary{% endif %}" style="width: {% if u.role == 'admin' %}85{% else %}40{% endif %}%"></div>
+                </div>
+                <span class="text-sm font-bold {% if u.role == 'admin' %}text-primary{% else %}text-secondary{% endif %}">
+                  {% if u.role == 'admin' %}12,450{% else %}3,200{% endif %} <span class="text-[10px]">XP</span>
+                </span>
+              </div>
+            </td>
+            <td class="px-8 py-5 text-right">
+              <button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-xl hover:bg-primary/10">
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center py-16 text-on-surface-variant">
+            <span class="material-symbols-outlined text-4xl block mb-3 text-on-surface-variant/30">group</span>
+            No users found.
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('customerSearch')?.addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.customer-row').forEach(row => {
+      const name = row.querySelector('.customer-name')?.textContent.toLowerCase() || '';
+      row.style.display = name.includes(q) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

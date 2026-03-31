@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Pristine Flow — Smart Laundry{% endblock %}</title>
+<meta name="description" content="Pristine Flow — Track your laundry orders in real time. Pay online, scan QR codes, get live updates.">
+<!-- PWA -->
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#0a0d0f">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon.svg') }}">
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#8ff5ff", "secondary": "#10d5ff", "tertiary": "#70aaff",
+          "surface": "#0a0d0f", "background": "#0a0d0f",
+          "on-surface": "#ffffff", "on-surface-variant": "#ababab",
+          "surface-container": "#151515", "surface-container-high": "#1c1c1c",
+          "surface-container-highest": "#232323", "outline-variant": "#333333",
+          "error": "#ff716c",
+        },
+        fontFamily: { "sans": ["Plus Jakarta Sans"] }
+      }
+    }
+  }
+</script>
+
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+  .bg-hero {
+    background:
+      radial-gradient(ellipse 100% 60% at 15% 0%, rgba(16,213,255,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 50% at 85% 100%, rgba(112,170,255,0.05) 0%, transparent 50%),
+      #0a0d0f;
+  }
+
+  .glass {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* Status badges */
+  .status-received   { background:rgba(59,130,246,.12); color:#60a5fa; border:1px solid rgba(59,130,246,.2); }
+  .status-washing    { background:rgba(139,92,246,.12); color:#c084fc; border:1px solid rgba(139,92,246,.2); }
+  .status-drying     { background:rgba(245,158,11,.12); color:#fbbf24; border:1px solid rgba(245,158,11,.2); }
+  .status-ironing    { background:rgba(236,72,153,.12); color:#f472b6; border:1px solid rgba(236,72,153,.2); }
+  .status-ready      { background:rgba(143,245,255,.12); color:#8ff5ff; border:1px solid rgba(143,245,255,.2); }
+  .status-delivered  { background:rgba(34,197,94,.12);  color:#4ade80; border:1px solid rgba(34,197,94,.2); }
+
+  /* Animations */
+  .fade-up { animation: fadeUp 0.5s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+  .pulse-ring { animation: pulseRing 2s ease-in-out infinite; }
+  @keyframes pulseRing {
+    0%,100%{ box-shadow: 0 0 0 0 rgba(143,245,255,.3); }
+    50%{ box-shadow: 0 0 0 12px rgba(143,245,255,.0); }
+  }
+
+  /* Scroll */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+
+  /* Toast */
+  #toast-container { position:fixed; top:1rem; right:1rem; z-index:9999; display:flex; flex-direction:column; gap:.5rem; max-width:320px; }
+  .toast { display:flex; align-items:flex-start; gap:.7rem; padding:.875rem 1rem; border-radius:.875rem; box-shadow:0 8px 30px rgba(0,0,0,.4); animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both; border:1px solid rgba(255,255,255,.1); color:#fff; }
+  .toast-status  { background:#1e3a5f; }
+  .toast-payment { background:#14532d; }
+  .toast-order   { background:#1e1b4b; }
+  @keyframes toastIn  { from{opacity:0;transform:translateX(50px)} to{opacity:1;transform:none} }
+  @keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateX(50px)} }
+  .toast.removing { animation:toastOut .3s ease forwards; }
+
+  /* Live dot */
+  .live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#22c55e; animation:pDot 1.5s infinite; }
+  @keyframes pDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+</style>
+</head>
+<body class="bg-hero min-h-screen text-white flex flex-col">
+
+<div id="toast-container"></div>
+
+<!-- Navbar -->
+<nav class="w-full glass sticky top-0 z-50">
+  <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="{{ url_for('index') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-surface text-base">water_drop</span>
+      </div>
+      <span class="font-extrabold tracking-tight text-base text-primary uppercase">PristineFlow</span>
+    </a>
+    <div class="flex items-center gap-4">
+      <span class="flex items-center gap-1.5 text-xs text-on-surface-variant">
+        <span class="live-dot"></span> Live
+      </span>
+      <a href="{{ url_for('staff_login') }}"
+        class="flex items-center gap-2 text-xs text-on-surface-variant hover:text-white border border-outline-variant hover:border-primary/40 px-3 py-1.5 rounded-xl transition-all">
+        <span class="material-symbols-outlined text-sm">shield</span> Staff Portal
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Flash Messages -->
+<div class="w-full max-w-3xl mx-auto px-4 mt-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for category, message in messages %}
+  <div class="fade-up glass rounded-xl p-4 mb-3 border-l-4 {% if category == 'error' %}border-red-500 text-red-300{% else %}border-green-400 text-green-300{% endif %}">
+    <p class="font-medium text-sm">{{ message }}</p>
+  </div>
+  {% endfor %}{% endif %}
+  {% endwith %}
+</div>
+
+<!-- Content -->
+<main class="flex-1 w-full">{% block content %}{% endblock %}</main>
+
+<!-- Footer -->
+<footer class="w-full glass border-t border-white/[0.06] py-6 mt-auto">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-on-surface-variant">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-surface" style="font-size:10px">water_drop</span>
+      </div>
+      <span>© 2025 PristineFlow Smart Laundry</span>
+    </div>
+    <div class="flex items-center gap-4 text-on-surface-variant/50">
+      <span class="flex items-center gap-1"><span class="live-dot w-1.5 h-1.5"></span> Real-time via Socket.IO</span>
+      <span>•</span>
+      <span>PWA Enabled</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Socket.IO Real-time Notifications -->
+<script>
+  const socket = io();
+  const toastCont = document.getElementById('toast-container');
+
+  function showToast(icon, title, msg, type) {
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.innerHTML = `<span class="material-symbols-outlined" style="font-size:1.2rem">${icon}</span>
+      <div style="flex:1"><div style="font-weight:700;font-size:.8rem">${title}</div>
+      <div style="font-size:.75rem;opacity:.8;margin-top:.1rem">${msg}</div></div>
+      <button onclick="dismiss(this.parentNode)" style="opacity:.5;font-size:.8rem;cursor:pointer">✕</button>`;
+    toastCont.prepend(t);
+    setTimeout(() => dismiss(t), 6000);
+  }
+  function dismiss(t) { if(!t)return; t.classList.add('removing'); setTimeout(()=>t.remove(),300); }
+
+  socket.on('status_update', d => showToast('autorenew', `Order ${d.order_id}`, `→ ${d.new_status}`, 'status'));
+  socket.on('payment_confirmed', d => showToast('check_circle', 'Payment Received!', `₹${parseFloat(d.amount).toFixed(2)} — ${d.order_id}`, 'payment'));
+  socket.on('new_order', d => showToast('add_circle', 'New Order', `${d.order_id} — ₹${parseFloat(d.amount).toFixed(2)}`, 'order'));
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

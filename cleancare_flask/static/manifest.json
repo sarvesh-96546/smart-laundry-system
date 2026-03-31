@@ -1,0 +1,17 @@
+{
+  "name": "CleanCare Laundry",
+  "short_name": "CleanCare",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
+  "description": "Smart Laundry System for precise tracking and updates.",
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

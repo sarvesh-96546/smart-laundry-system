@@ -1,0 +1,42 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const http = require('http');
+const { Server } = require('socket.io');
+const userRoutes = require('./routes/userRoutes');
+
+dotenv.config();
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE"]
+    }
+});
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Attach io to app for use in controllers
+app.set('io', io);
+
+// Socket.io Connection Logic
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+    socket.emit('connected', { message: 'Welcome to Pristine Flow Auth Server' });
+    
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
+
+// Routes
+app.use('/api', userRoutes);
+
+const PORT = process.env.PORT || 5002;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

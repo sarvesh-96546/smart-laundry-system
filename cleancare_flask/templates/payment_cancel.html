@@ -1,0 +1,32 @@
+{% extends 'customer_base.html' %}
+{% block title %}Payment Cancelled — CleanCare{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-16">
+    <div class="glass rounded-2xl overflow-hidden fade-up">
+        <div class="px-8 py-10 text-center space-y-4">
+            <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-circle-xmark text-amber-400 text-4xl"></i>
+            </div>
+            <h1 class="text-2xl font-black">Payment Cancelled</h1>
+            <p class="text-white/50">No charges were made. Your order is safely in the system.</p>
+
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-left">
+                <div class="text-xs text-white/40 mb-1 uppercase tracking-wider">Order ID</div>
+                <div class="font-mono font-bold text-amber-400 text-xl">{{ order_id }}</div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-2">
+                <a href="{{ url_for('pay', order_id=order_id) }}"
+                   class="btn-gold py-3 px-6 rounded-xl w-full flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-credit-card"></i> Try Payment Again
+                </a>
+                <a href="{{ url_for('index') }}?order_id={{ order_id }}"
+                   class="text-white/30 hover:text-white/60 text-sm transition-colors flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Order
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

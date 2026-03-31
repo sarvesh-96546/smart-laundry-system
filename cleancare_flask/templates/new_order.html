@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-8 fade-in">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="{{ url_for('admin') }}"
+            class="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-100 text-blue-600 flex items-center justify-center rounded-xl text-xl">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            Create New Order
+        </h1>
+        <p class="text-slate-500 mt-2">Enter customer details to register a new laundry order.</p>
+    </div>
+
+    <!-- Form Card -->
+    {% if qr_code %}
+    <div
+        class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden p-10 text-center animate-fade-in">
+        <div
+            class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-primary-navy mb-2">Order Created Successfully!</h2>
+        <p class="text-slate-500 mb-8">Order ID: <span class="font-mono font-bold text-slate-800">{{ order_id }}</span>
+        </p>
+
+        <div class="bg-slate-50 p-6 rounded-2xl inline-block border border-slate-100 shadow-inner mb-8">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="Order QR Code"
+                class="w-48 h-48 mx-auto mix-blend-multiply">
+            <p class="text-sm font-medium text-slate-500 mt-4 leading-tight">Scan this QR code<br>to track your order.
+            </p>
+        </div>
+
+        <div class="flex justify-center gap-4">
+            <a href="{{ url_for('new_order') }}"
+                class="px-6 py-3 font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                Create Another
+            </a>
+            <a href="{{ url_for('admin') }}"
+                class="bg-primary-navy hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                View Dashboard
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <form method="POST" action="{{ url_for('new_order') }}" class="p-8 space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1 md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Customer Full Name</label>
+                    <div class="relative">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                        <input type="text" name="customer_name" required
+                            class="pl-10 w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all placeholder:text-slate-400"
+                            placeholder="Jane Doe">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
+                    <div class="relative">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <input type="text" name="phone" required
+                            class="pl-10 w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all placeholder:text-slate-400"
+                            placeholder="555-0123">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Total Items (Pieces)</label>
+                    <div class="relative">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-shirt"></i>
+                        </div>
+                        <input type="number" name="items_count" min="1" required
+                            class="pl-10 w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all placeholder:text-slate-400"
+                            placeholder="5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
+                <a href="{{ url_for('admin') }}"
+                    class="px-6 py-3 font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="bg-primary-navy hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-check"></i> Register Order
+                </button>
+            </div>
+
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

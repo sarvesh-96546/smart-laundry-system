@@ -1,0 +1,130 @@
+{% extends 'staff_base.html' %}
+{% block title %}Alchemy Pricing — Pristine Flow{% endblock %}
+{% block page_title %}Alchemy Pricing{% endblock %}
+
+{% block content %}
+<div class="space-y-8 fade-in">
+
+  <!-- Header -->
+  <div>
+    <p class="text-[10px] font-bold text-on-surface-variant tracking-[0.2em] uppercase mb-1">Pricing Configuration</p>
+    <h2 class="text-3xl font-extrabold tracking-tight text-white">Alchemy Pricing</h2>
+  </div>
+
+  <!-- Current Rate Banner -->
+  <div class="glass-panel rounded-2xl border border-primary/20 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary">currency_rupee</span>
+      </div>
+      <div>
+        <p class="text-xs text-on-surface-variant uppercase tracking-widest">Current Base Rate</p>
+        <p class="text-2xl font-extrabold text-white">₹{{ price_per_item }} <span class="text-sm text-on-surface-variant font-normal">per item</span></p>
+      </div>
+    </div>
+    {% if session.get('role') == 'admin' %}
+    <form method="POST" action="{{ url_for('admin_update_price') }}" class="flex items-center gap-3">
+      <input type="number" name="price" value="{{ price_per_item }}" min="1" step="1"
+        class="bg-surface-container-high border border-outline-variant/30 text-white rounded-xl px-4 py-2.5 text-sm w-28 outline-none focus:border-primary/50 transition-colors">
+      <button type="submit" class="px-5 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-bold hover:bg-primary/20 transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">save</span> Update
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Fabric Type Multipliers (matching Stitch Pricing) -->
+    <div class="glass-panel rounded-3xl border border-outline-variant/10 p-7">
+      <h3 class="text-base font-bold text-white mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">straighten</span> Fabric Type Multipliers
+      </h3>
+      <div class="space-y-4">
+        {% set fabrics = [
+          ('Cotton', '1.0x', 'Standard', 'primary', 60),
+          ('Silk', '2.5x', 'Delicate', 'secondary', 85),
+          ('Wool', '2.0x', 'Premium', 'tertiary', 70),
+          ('Synthetic', '1.5x', 'Technical', 'on-surface-variant', 50)
+        ] %}
+        {% for name, mult, label, color, pct in fabrics %}
+        <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface-container-high/40 hover:bg-surface-container-high/70 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-{{ color }}/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-{{ color }} text-sm">texture</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center mb-1.5">
+              <div>
+                <p class="text-sm font-bold text-white">{{ name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ label }}</p>
+              </div>
+              <span class="text-sm font-extrabold text-{{ color }}">{{ mult }}</span>
+            </div>
+            <div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+              <div class="h-full bg-{{ color }} rounded-full" style="width: {{ pct }}%"></div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Service Tier Packages (matching Stitch) -->
+    <div class="glass-panel rounded-3xl border border-outline-variant/10 p-7">
+      <h3 class="text-base font-bold text-white mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary">workspace_premium</span> Service Tier Packages
+      </h3>
+      <div class="space-y-4">
+        <!-- Standard -->
+        <div class="p-5 rounded-2xl bg-surface-container-high/40 border border-outline-variant/10 hover:border-primary/20 transition-colors">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="text-sm font-bold text-white">Standard Alchemy</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">Basic wash & fold service</p>
+            </div>
+            <span class="text-lg font-extrabold text-primary">₹{{ price_per_item }}<span class="text-xs text-on-surface-variant font-normal">/item</span></span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {% for feat in ['Wash & Fold', '48hr Turnaround', 'SMS Updates'] %}
+            <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/15">{{ feat }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Premium -->
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 hover:border-primary/40 transition-colors">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="text-sm font-bold text-white">Premium Alchemist</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">Full-service with ironing</p>
+            </div>
+            <span class="text-lg font-extrabold text-primary">₹{{ (price_per_item * 1.8)|int }}<span class="text-xs text-on-surface-variant font-normal">/item</span></span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {% for feat in ['Wash', 'Iron', 'Fold', '24hr Turnaround', 'WhatsApp Updates', 'QR Tracking'] %}
+            <span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold border border-secondary/15">{{ feat }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Master Sage -->
+        <div class="p-5 rounded-2xl bg-surface-container-high/40 border border-outline-variant/10 hover:border-tertiary/20 transition-colors">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="text-sm font-bold text-white">Master Sage</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">White-glove dry cleaning</p>
+            </div>
+            <span class="text-lg font-extrabold text-tertiary">₹{{ (price_per_item * 3)|int }}<span class="text-xs text-on-surface-variant font-normal">/item</span></span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {% for feat in ['Dry Clean', 'Steam Press', 'Premium Packaging', '12hr Express', 'Dedicated Agent'] %}
+            <span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-bold border border-tertiary/15">{{ feat }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

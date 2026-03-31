@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+    <!-- Background Circle -->
+    <circle cx="256" cy="256" r="256" fill="#0f2557" />
+    <!-- Gradient for inside of washer -->
+    <defs>
+        <radialGradient id="waterGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4e73df"/>
+            <stop offset="100%" stop-color="#1A1F2C"/>
+        </radialGradient>
+    </defs>
+    <!-- Washing Machine Body -->
+    <rect x="128" y="96" width="256" height="320" rx="32" fill="#F8FAFC" />
+    <rect x="128" y="96" width="256" height="80" rx="32" fill="#E2E8F0" />
+    <rect x="128" y="144" width="256" height="32" fill="#E2E8F0" />
+    <!-- Controls (Buttons & Dial) -->
+    <circle cx="170" cy="136" r="12" fill="#94A3B8" />
+    <circle cx="210" cy="136" r="12" fill="#94A3B8" />
+    <circle cx="330" cy="136" r="24" fill="#64748B" />
+    <circle cx="330" cy="136" r="16" fill="#475569" />
+    <!-- Washing Machine Door Outer -->
+    <circle cx="256" cy="280" r="96" fill="#CBD5E1" />
+    <!-- Washing Machine Door Inner (Glass/Water) -->
+    <circle cx="256" cy="280" r="76" fill="url(#waterGrad)" />
+    <!-- Water Highlight/Wave Effect -->
+    <path d="M 180 280 Q 215 250 256 280 T 332 280 A 76 76 0 0 1 180 280 Z" fill="#3B82F6" opacity="0.8" />
+</svg>

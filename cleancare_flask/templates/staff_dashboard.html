@@ -1,0 +1,267 @@
+{% extends 'staff_base.html' %}
+{% block title %}Dashboard — Pristine Flow{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-12 fade-in">
+  <!-- Key Metrics Bento Grid -->
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="glass-panel p-8 rounded-3xl border border-outline-variant/10 hover:border-primary/30 transition-all group">
+      <div class="flex justify-between items-start mb-4">
+        <span class="p-3 bg-primary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined" data-icon="payments">payments</span>
+        </span>
+        <span class="text-xs font-bold text-green-400 px-2 py-1 bg-green-400/10 rounded-full">+12.4%</span>
+      </div>
+      <p class="text-slate-500 text-xs font-bold tracking-widest uppercase mb-1">Total Revenue</p>
+      <h3 class="text-4xl font-extrabold tracking-tighter text-on-surface">₹{{ "%.0f"|format(analytics.revenue) }}</h3>
+    </div>
+    <div class="glass-panel p-8 rounded-3xl border border-outline-variant/10 hover:border-primary/30 transition-all group">
+      <div class="flex justify-between items-start mb-4">
+        <span class="p-3 bg-secondary/10 rounded-2xl text-secondary group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+        </span>
+        <span class="text-xs font-bold text-green-400 px-2 py-1 bg-green-400/10 rounded-full">+4.2%</span>
+      </div>
+      <p class="text-slate-500 text-xs font-bold tracking-widest uppercase mb-1">Active Users</p>
+      <h3 class="text-4xl font-extrabold tracking-tighter text-on-surface">{{ analytics.active_users|default(0) }}</h3>
+    </div>
+    <div class="glass-panel p-8 rounded-3xl border border-outline-variant/10 hover:border-primary/30 transition-all group">
+      <div class="flex justify-between items-start mb-4">
+        <span class="p-3 bg-tertiary/10 rounded-2xl text-tertiary group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+        </span>
+        <span class="text-xs font-bold text-slate-500 px-2 py-1 bg-slate-500/10 rounded-full">Stable</span>
+      </div>
+      <p class="text-slate-500 text-xs font-bold tracking-widest uppercase mb-1">Average Order Value</p>
+      <h3 class="text-4xl font-extrabold tracking-tighter text-on-surface">₹{{ "%.0f"|format(analytics.aov|default(0)) }}</h3>
+    </div>
+    <div class="glass-panel p-8 rounded-3xl border border-outline-variant/10 hover:border-primary/30 transition-all group">
+      <div class="flex justify-between items-start mb-4">
+        <span class="p-3 bg-error/10 rounded-2xl text-error group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined" data-icon="speed">speed</span>
+        </span>
+        <span class="text-xs font-bold text-error px-2 py-1 bg-error/10 rounded-full">-2.1%</span>
+      </div>
+      <p class="text-slate-500 text-xs font-bold tracking-widest uppercase mb-1">Pending Pickups</p>
+      <h3 class="text-4xl font-extrabold tracking-tighter text-on-surface">{{ analytics.ready }}</h3>
+    </div>
+  </section>
+
+  <!-- Main Data Row: Growth Chart & Health Monitor -->
+  <section class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <!-- Revenue Growth Chart (Visual Mockup) -->
+    <div class="xl:col-span-2 glass-panel p-10 rounded-[2.5rem] border border-outline-variant/10">
+      <div class="flex justify-between items-center mb-12">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight text-on-surface">Revenue Growth</h2>
+          <p class="text-slate-500 text-sm">Real-time earnings tracking across all platforms</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-4 py-2 rounded-xl bg-surface-container text-xs font-bold text-slate-300">WEEKS</button>
+          <button class="px-4 py-2 rounded-xl bg-primary text-xs font-bold text-surface">MONTHS</button>
+        </div>
+      </div>
+      <div class="h-[300px] w-full relative">
+        <svg class="w-full h-full overflow-visible" preserveaspectratio="none">
+          <defs>
+            <lineargradient id="gradientCyan" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#8ff5ff" stop-opacity="0.3"></stop>
+              <stop offset="100%" stop-color="#8ff5ff" stop-opacity="0"></stop>
+            </lineargradient>
+          </defs>
+          <path d="M0,280 Q100,240 200,260 T400,180 T600,210 T800,80 T1000,100" fill="none" stroke="#8ff5ff" stroke-linecap="round" stroke-width="4"></path>
+          <path d="M0,280 Q100,240 200,260 T400,180 T600,210 T800,80 T1000,100 V300 H0 Z" fill="url(#gradientCyan)"></path>
+          <circle cx="200" cy="260" fill="#8ff5ff" r="6"></circle>
+          <circle cx="400" cy="180" fill="#8ff5ff" r="6"></circle>
+          <circle cx="600" cy="210" fill="#8ff5ff" r="6"></circle>
+          <circle class="animate-pulse shadow-lg" cx="800" cy="80" fill="#8ff5ff" r="6"></circle>
+        </svg>
+        <div class="absolute top-10 right-40 glass-panel border border-primary/40 px-4 py-3 rounded-2xl shadow-2xl">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Projected Peak</p>
+          <p class="text-lg font-bold text-primary">₹64,200</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-6 mt-8 border-t border-outline-variant/10 pt-6">
+        <div class="text-center"><p class="text-[10px] font-bold text-slate-600 uppercase">Jan</p></div>
+        <div class="text-center"><p class="text-[10px] font-bold text-slate-600 uppercase">Feb</p></div>
+        <div class="text-center"><p class="text-[10px] font-bold text-slate-600 uppercase">Mar</p></div>
+        <div class="text-center"><p class="text-[10px] font-bold text-slate-600 uppercase">Apr</p></div>
+        <div class="text-center"><p class="text-[10px] font-bold text-slate-600 uppercase">May</p></div>
+        <div class="text-center"><p class="text-[10px] font-bold text-primary uppercase">Jun</p></div>
+      </div>
+    </div>
+
+    <!-- System Health Monitor -->
+    <div class="glass-panel p-10 rounded-[2.5rem] border border-outline-variant/10">
+      <h2 class="text-xl font-bold tracking-tight text-on-surface mb-8">System Health</h2>
+      <div class="space-y-6">
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low border border-outline-variant/5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-green-400/10 flex items-center justify-center text-green-400 machine-pulse">
+              <span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+            </div>
+            <div>
+              <p class="text-sm font-bold">Washing Machines</p>
+              <p class="text-xs text-slate-500">{{ mach_stats.ok }}/{{ mach_stats.ok + mach_stats.maintenance + mach_stats.offline }} Online</p>
+            </div>
+          </div>
+          <div class="w-16 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-green-400 w-[{% if (mach_stats.ok + mach_stats.maintenance + mach_stats.offline) > 0 %}{{ (mach_stats.ok / (mach_stats.ok + mach_stats.maintenance + mach_stats.offline) * 100)|int }}{% else %}0{% endif %}%]"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low border border-outline-variant/5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined" data-icon="dry">dry</span>
+            </div>
+            <div>
+              <p class="text-sm font-bold">Dryer Units</p>
+              <p class="text-xs text-slate-500">28/28 Online</p>
+            </div>
+          </div>
+          <div class="w-16 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-primary w-[100%]"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container-low border border-outline-variant/5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error">
+              <span class="material-symbols-outlined" data-icon="warning">warning</span>
+            </div>
+            <div>
+              <p class="text-sm font-bold">Payment Kiosks</p>
+              <p class="text-xs text-slate-500">{{ mach_stats.offline }}/15 Offline</p>
+            </div>
+          </div>
+          <div class="w-16 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-error w-[80%]"></div>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-outline-variant/10">
+          <h3 class="text-xs font-bold text-slate-500 tracking-widest uppercase mb-4">Location Load</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between text-xs">
+              <span>Downtown Hub</span>
+              <span class="text-primary font-bold">88% Capacity</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-primary to-secondary w-[88%]"></div>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span>Sunset District</span>
+              <span class="text-tertiary font-bold">42% Capacity</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-tertiary to-secondary w-[42%]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Management Table Section -->
+  <section class="glass-panel rounded-[2.5rem] border border-outline-variant/10 overflow-hidden">
+    <div class="px-10 py-8 flex justify-between items-center border-b border-outline-variant/10">
+      <div>
+        <h2 class="text-xl font-bold tracking-tight text-white">User Management</h2>
+        <p class="text-slate-500 text-sm">Monitor and manage access for staff and customers</p>
+      </div>
+      <div class="flex gap-4">
+        <button class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-surface-container-high text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+          Filters
+        </button>
+        <button class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-surface-container-high text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+          Export
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-surface-container-low">
+            <th class="px-10 py-4">User Identity</th>
+            <th class="px-6 py-4">Role</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4">Total Orders</th>
+            <th class="px-6 py-4">Last Active</th>
+            <th class="px-10 py-4 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/5">
+          {% for u in users|default([]) %}
+          <tr class="hover:bg-surface-container-high/40 transition-colors">
+            <td class="px-10 py-6">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-sm font-bold text-primary border border-outline-variant/20 uppercase">
+                  {{ u.username[0] if u.username else 'U' }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-white">{{ u.username }}</p>
+                  <p class="text-xs text-slate-500">{{ u.username|lower }}@example.com</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-6">
+              {% if u.role == 'admin' %}
+              <span class="px-3 py-1 bg-tertiary/10 text-tertiary text-[10px] font-bold rounded-full uppercase tracking-tighter">System Admin</span>
+              {% else %}
+              <span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full uppercase tracking-tighter">Standard User</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-6">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                <span class="text-xs font-medium text-white">Online</span>
+              </div>
+            </td>
+            <td class="px-6 py-6 font-bold text-sm text-white">--</td>
+            <td class="px-6 py-6 text-xs text-slate-400">Recently</td>
+            <td class="px-10 py-6 text-right">
+              <button class="p-2 text-slate-500 hover:text-primary"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="px-10 py-6 bg-surface-container-low flex justify-between items-center">
+      <p class="text-xs text-slate-500">Showing <span class="text-slate-200">1-{{ users|length }}</span> of <span class="text-slate-200">{{ analytics.active_users|default(0) }}</span> users</p>
+      <div class="flex gap-2">
+        <button class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+        </button>
+        <button class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-surface">1</button>
+        <button class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const socket = io();
+  socket.on('status_update', d => {
+    const b = document.querySelector(`[data-order-badge="${d.order_id}"]`);
+    if (b) {
+      const colors = {
+        'Washing': 'bg-purple-400/10 text-purple-400 border-purple-400/20',
+        'Drying': 'bg-amber-400/10 text-amber-400 border-amber-400/20',
+        'Ironing': 'bg-pink-400/10 text-pink-400 border-pink-400/20',
+        'Ready for Pickup': 'bg-primary/10 text-primary border-primary/20',
+        'Delivered': 'bg-green-400/10 text-green-400 border-green-400/20',
+        'Received': 'bg-blue-400/10 text-blue-400 border-blue-400/20'
+      };
+      b.className = `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${colors[d.new_status] || colors['Received']}`;
+      b.innerText = d.new_status;
+    }
+  });
+</script>
+{% endblock %}

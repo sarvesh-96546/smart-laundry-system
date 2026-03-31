@@ -1,0 +1,56 @@
+{% extends 'staff_base.html' %}
+{% block title %}Audit Logs — Lumina Wash{% endblock %}
+{% block page_title %}Audit Logs{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto fade-in pt-8">
+    <div class="bg-[#131313] rounded-3xl border border-white/10 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+        <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-white/5 to-transparent">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-tertiary/20 flex items-center justify-center border border-tertiary/30">
+                    <span class="material-symbols-outlined text-tertiary">history</span>
+                </div>
+                <div>
+                    <h2 class="font-headline font-bold text-lg text-white tracking-tight">System Audit Log</h2>
+                    <p class="text-[10px] font-bold text-[#ababab] uppercase tracking-widest mt-0.5">Most Recent 100 Events</p>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-white/5 border-b border-white/10">
+                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#ababab]">Time</th>
+                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#ababab]">Action</th>
+                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#ababab]">Details</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for log in logs %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="px-6 py-4 text-[#ababab] text-xs font-mono whitespace-nowrap">{{ log.timestamp }}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest
+                                {% if 'PAYMENT' in log.action %}bg-green-500/10 text-green-400 border border-green-500/20
+                                {% elif 'DELETE' in log.action %}bg-[#ff716c]/10 text-[#ff716c] border border-[#ff716c]/20
+                                {% elif 'MACHINE' in log.action %}bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                {% else %}bg-primary/10 text-primary border border-primary/20{% endif %}">
+                                {{ log.action }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-300 text-sm max-w-md truncate" title="{{ log.details }}">{{ log.details }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-20 border-2 border-dashed border-white/5 rounded-2xl m-6 inline-block w-[calc(100%-3rem)]">
+                            <span class="material-symbols-outlined text-6xl text-slate-700 block mb-4">history</span>
+                            <p class="text-sm font-bold text-[#ababab] uppercase tracking-widest">No audit logs recorded yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

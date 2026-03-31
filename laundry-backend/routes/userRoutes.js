@@ -1,0 +1,35 @@
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
+const orderController = require('../controllers/orderController');
+const machineController = require('../controllers/machineController');
+const statsController = require('../controllers/statsController');
+const { verifyToken, isAdmin, isStaff } = require('../middleware/auth');
+
+router.post('/register', userController.register);
+router.post('/login', userController.login);
+
+// Orders
+router.post('/orders', [verifyToken], orderController.createOrder); 
+router.get('/orders', [verifyToken], orderController.getOrders);
+router.get('/orders/:id', [verifyToken], orderController.getOrderById);
+router.put('/orders/:id/status', [verifyToken, isStaff], orderController.updateOrderStatus);
+
+// Machinery
+router.get('/machinery', machineController.getMachinery);
+router.post('/machines/:machine_id/start', [verifyToken, isStaff], machineController.startMachine);
+router.post('/machines/:machine_id/stop', [verifyToken, isStaff], machineController.stopMachine);
+
+// Stats
+router.get('/stats', statsController.getStats);
+
+// Customers (Users with role 'customer')
+router.get('/customers', userController.getCustomers);
+
+// Protected User routes
+router.get('/users', [verifyToken, isAdmin], userController.getUsers);
+router.get('/users/:id', [verifyToken], userController.getUserById);
+router.put('/users/:id', [verifyToken], userController.updateUser);
+router.delete('/users/:id', [verifyToken, isAdmin], userController.deleteUser);
+
+module.exports = router;

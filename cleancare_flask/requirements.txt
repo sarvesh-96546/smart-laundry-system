@@ -1,0 +1,7 @@
+Flask
+Werkzeug
+Flask-SocketIO
+qrcode[pil]
+razorpay
+eventlet
+gunicorn
