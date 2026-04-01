@@ -24,11 +24,31 @@ const verifyToken = async (req, res, next) => {
         // In Supabase, custom roles can be stored in user_metadata or app_metadata
         // Alternatively, since we created a separate public.users table, we should fetch the role from there.
         
-        const { data: userData } = await supabase
+        let { data: userData, error: fetchError } = await supabase
             .from('users')
             .select('role, name')
-            .eq('email', user.email)
+            .eq('id', user.id)
             .single();
+
+        if (fetchError || !userData) {
+            // User entry missing in public.users, create it
+            const newUserData = {
+                id: user.id,
+                email: user.email,
+                name: user.user_metadata?.full_name || user.email.split('@')[0],
+                role: 'customer'
+            };
+            const { data: createdUser, error: insertError } = await supabase
+                .from('users')
+                .insert(newUserData)
+                .select('role, name')
+                .single();
+            
+            if (insertError) {
+                console.error('[AUTH_SYNC_ERROR] Failed to create public.users record:', insertError);
+            }
+            userData = createdUser || newUserData;
+        }
 
         req.userRole = userData?.role || 'customer';
         req.userName = userData?.name || user.email.split('@')[0];
