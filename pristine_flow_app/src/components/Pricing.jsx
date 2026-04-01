@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 
 export default function Pricing() {
@@ -16,7 +16,7 @@ export default function Pricing() {
     <>
       <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="flex justify-between items-center px-8 h-20 w-full">
-          <div className="text-2xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-cyan-300 to-blue-500 font-headline">
+          <div className="text-2xl font-bold tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-cyan-300 to-blue-500 font-headline">
             Pristine Flow
           </div>
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-tight">
@@ -28,11 +28,11 @@ export default function Pricing() {
         </div>
       </nav>
 
-      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto bg-[#080808] text-white">
+      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto bg-background text-white">
         <header className="mb-16 flex justify-between items-end">
           <div>
             <h1 className="text-[3.5rem] font-bold tracking-tight text-white leading-tight">
-              Service <span className="text-[#8ff5ff]">Catalog</span>
+              Service <span className="text-primary">Catalog</span>
             </h1>
             <p className="text-slate-400 max-w-xl mt-4 text-lg">
               Precision care for every fiber. Transparent pricing for the modern lifestyle.
@@ -52,7 +52,7 @@ export default function Pricing() {
               </div>
             ) : (
               <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setIsEditing(true)}>
-                <span className="text-2xl font-bold text-[#8ff5ff]">₹{prices.base}</span>
+                <span className="text-2xl font-bold text-primary">₹{prices.base}</span>
                 <span className="material-symbols-outlined text-xs text-slate-500 group-hover:text-cyan-400">edit</span>
               </div>
             )}
@@ -64,14 +64,14 @@ export default function Pricing() {
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-8">
-                  <span className="material-symbols-outlined text-[#8ff5ff] text-4xl p-3 bg-[#8ff5ff]/10 rounded-xl">wash</span>
-                  <span className="px-4 py-1 rounded-full bg-[#8ff5ff]/20 text-[#8ff5ff] text-[0.7rem] font-bold tracking-widest uppercase">Popular Choice</span>
+                  <span className="material-symbols-outlined text-primary text-4xl p-3 bg-primary/10 rounded-xl">wash</span>
+                  <span className="px-4 py-1 rounded-full bg-primary/20 text-primary text-[0.7rem] font-bold tracking-widest uppercase">Popular Choice</span>
                 </div>
                 <h3 className="text-3xl font-bold text-white mb-2">Wash & Fold</h3>
                 <p className="text-slate-400 max-w-md">Everyday luxury. We sort, pre-treat, wash, and expertly fold your garments with eco-friendly detergents.</p>
               </div>
               <div className="mt-12 flex items-baseline gap-2">
-                <span className="text-5xl font-extrabold text-[#8ff5ff]">₹{prices.base * 2.5}</span>
+                <span className="text-5xl font-extrabold text-primary">₹{prices.base * 2.5}</span>
                 <span className="text-slate-500 font-medium">/ per kg</span>
               </div>
             </div>
@@ -86,15 +86,15 @@ export default function Pricing() {
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                   <span className="text-sm">Silk Blouse</span>
-                  <span className="text-[#8ff5ff] font-bold">₹{prices.base * 5}</span>
+                  <span className="text-primary font-bold">₹{prices.base * 5}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                   <span className="text-sm">Trousers</span>
-                  <span className="text-[#8ff5ff] font-bold">₹{prices.base * 4}</span>
+                  <span className="text-primary font-bold">₹{prices.base * 4}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm">Full Suit</span>
-                  <span className="text-[#8ff5ff] font-bold">₹{prices.base * 12}</span>
+                  <span className="text-primary font-bold">₹{prices.base * 12}</span>
                 </div>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#8ff5ff] to-[#3b82f6] p-12 text-black">
+        <section className="relative rounded-2xl overflow-hidden bg-linear-to-br from-primary to-tertiary p-12 text-black">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-xl">
               <h2 className="text-4xl font-extrabold mb-4 tracking-tight">The Pristine Membership</h2>

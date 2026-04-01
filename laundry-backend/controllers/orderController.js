@@ -116,7 +116,6 @@ const updateOrderStatus = async (req, res) => {
         const { error: logErr } = await supabase.from('order_updates').insert({ order_id: orderId, status });
         if (logErr) throw logErr;
 
-        // Trigger Emails on Ready
         if (status === 'Completed' || status === 'Ready') {
             if (currentOrder.customer_id) {
                 const { data: userData } = await supabase.from('users').select('email').eq('id', currentOrder.customer_id).single();

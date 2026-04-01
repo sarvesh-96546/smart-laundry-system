@@ -1,12 +1,10 @@
 const supabase = require('../config/supabase');
 
 const register = async (req, res) => {
-    // Deprecated: Handled directly by Supabase Auth on the frontend
     res.status(400).json({ message: 'Authentication is now handled by Supabase Auth. Please use the frontend client to register/login.' });
 };
 
 const login = async (req, res) => {
-    // Deprecated: Handled directly by Supabase Auth on the frontend
     res.status(400).json({ message: 'Authentication is now handled by Supabase Auth. Please use the frontend client to register/login.' });
 };
 

@@ -20,17 +20,17 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm print:p-0 print:bg-white print:static">
-      <div className="bg-white text-black w-full max-w-2xl rounded-[2rem] overflow-hidden shadow-2xl print:shadow-none print:rounded-none">
+    <div className="fixed inset-0 z-20000 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm print:p-0 print:bg-white print:static">
+      <div className="bg-white text-black w-full max-w-2xl rounded-4xl overflow-hidden shadow-2xl print:shadow-none print:rounded-none">
         
         {/* Header - Non-Printable */}
         <div className="bg-[#111] p-6 flex justify-between items-center print:hidden">
             <h2 className="text-white font-bold flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#8ff5ff]">receipt_long</span>
+                <span className="material-symbols-outlined text-primary">receipt_long</span>
                 Invoice Preview
             </h2>
             <div className="flex gap-2">
-                <button onClick={handleDownload} disabled={downloading} className={`px-4 py-2 text-black font-bold rounded-xl text-xs flex items-center gap-2 transition-all ${downloading ? 'bg-slate-400 opacity-70' : 'bg-[#8ff5ff] hover:bg-[#6edbe6]'}`}>
+                <button onClick={handleDownload} disabled={downloading} className={`px-4 py-2 text-black font-bold rounded-xl text-xs flex items-center gap-2 transition-all ${downloading ? 'bg-slate-400 opacity-70' : 'bg-primary hover:bg-[#6edbe6]'}`}>
                     <span className="material-symbols-outlined text-sm">
                         {downloading ? 'hourglass_empty' : 'download'}
                     </span>

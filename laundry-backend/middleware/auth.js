@@ -4,7 +4,6 @@ const { auth } = require('../auth');
 const verifyToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     try {
-        // 1. Try Better Auth Session first
         const session = await auth.api.getSession({ headers: req.headers });
         if (session) {
             req.userId = session.user.id;
@@ -13,7 +12,6 @@ const verifyToken = async (req, res, next) => {
             return next();
         }
 
-        // 2. Fallback to Supabase Token (Legacy/Manual)
         const token = authHeader.split(' ')[1];
         if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
@@ -31,7 +29,6 @@ const verifyToken = async (req, res, next) => {
             .single();
 
         if (fetchError || !userData) {
-            // User entry missing in public.users, create it
             const newUserData = {
                 id: user.id,
                 email: user.email,

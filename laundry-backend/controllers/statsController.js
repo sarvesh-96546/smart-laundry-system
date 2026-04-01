@@ -15,7 +15,6 @@ const getStats = async (req, res) => {
             if (o.status === 'Ready' || o.status === 'Completed') ready++;
         });
 
-        // Group by date for chart (handle timezone strings correctly)
         const chartDataMap = {};
         orders.forEach(o => {
             const date = new Date(o.created_at).toISOString().split('T')[0];

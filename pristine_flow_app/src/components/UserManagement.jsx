@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useApp } from '../context/useApp';
 import toast from 'react-hot-toast';
 
 export default function UserManagement() {
@@ -10,7 +10,7 @@ export default function UserManagement() {
     const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'customer', phone_number: '' });
     const [editingId, setEditingId] = useState(null);
 
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/api/users`, {
@@ -22,16 +22,16 @@ export default function UserManagement() {
             } else {
                 toast.error(data.message || 'Failed to fetch users');
             }
-        } catch (err) {
+        } catch {
             toast.error('Error connecting to server');
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL]);
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [fetchUsers]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -58,7 +58,7 @@ export default function UserManagement() {
             } else {
                 toast.error(data.message || 'Operation failed');
             }
-        } catch (err) {
+        } catch {
             toast.error('Network error');
         }
     };
@@ -77,7 +77,7 @@ export default function UserManagement() {
             } else {
                 toast.error('Failed to delete');
             }
-        } catch (err) {
+        } catch {
             toast.error('Network error');
         }
     };
@@ -85,7 +85,7 @@ export default function UserManagement() {
     if (loading) return <div className="p-8 text-center text-slate-500 uppercase tracking-widest text-xs">Accessing User Database...</div>;
 
     return (
-        <div className="min-h-screen bg-[#080808] text-white p-8 pt-24 font-['Plus_Jakarta_Sans']">
+        <div className="min-h-screen bg-background text-white p-8 pt-24 font-['Plus_Jakarta_Sans']">
             <div className="max-w-6xl mx-auto">
                 <header className="flex justify-between items-center mb-10">
                     <div>
@@ -94,17 +94,17 @@ export default function UserManagement() {
                     </div>
                     <button 
                         onClick={() => { setShowModal(true); setEditingId(null); setFormData({ name: '', email: '', password: '', role: 'customer', phone_number: '' }); }}
-                        className="px-6 py-2.5 bg-[#8ff5ff] text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 text-sm shadow-lg shadow-[#8ff5ff]/10"
+                        className="px-6 py-2.5 bg-primary text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 text-sm shadow-lg shadow-primary/10"
                     >
                         <span className="material-symbols-outlined text-sm">person_add</span>
                         New Operator
                     </button>
                 </header>
 
-                <div className="bg-[#121212] rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                <div className="bg-[#121212] rounded-4xl border border-white/5 overflow-hidden shadow-2xl">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5 bg-white/[0.02]">
+                            <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5 bg-white/2">
                                 <th className="px-8 py-6">Identity</th>
                                 <th className="px-8 py-6">Role</th>
                                 <th className="px-8 py-6">Contact</th>
@@ -112,16 +112,16 @@ export default function UserManagement() {
                                 <th className="px-8 py-6 text-right">Protocol</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.03]">
+                        <tbody className="divide-y divide-white/3">
                             {users.map(user => (
-                                <tr key={user.id} className="group hover:bg-white/[0.02] transition-colors">
+                                <tr key={user.id} className="group hover:bg-white/2 transition-colors">
                                     <td className="px-8 py-6">
                                         <div className="font-bold text-sm">{user.name}</div>
                                         <div className="text-[10px] text-slate-500 font-mono tracking-tighter">{user.email}</div>
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest ${
-                                            user.role === 'admin' ? 'bg-[#8ff5ff]/10 text-[#8ff5ff]' : 
+                                            user.role === 'admin' ? 'bg-primary/10 text-primary' : 
                                             user.role === 'staff' ? 'bg-yellow-500/10 text-yellow-500' : 
                                             'bg-white/5 text-slate-500'
                                         }`}>
@@ -134,7 +134,7 @@ export default function UserManagement() {
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 
                                                 onClick={() => { setEditingId(user.id); setFormData({ ...user, password: '' }); setShowModal(true); }}
-                                                className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-[#8ff5ff] transition-colors"
+                                                className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-primary transition-colors"
                                             >
                                                 <span className="material-symbols-outlined text-sm">edit</span>
                                             </button>
@@ -154,10 +154,10 @@ export default function UserManagement() {
             </div>
 
             {showModal && (
-                <div className="fixed inset-0 bg-[#000]/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-                    <div className="bg-[#121212] border border-white/10 rounded-[2rem] w-full max-w-md p-8 shadow-2xl">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-100 flex items-center justify-center p-4">
+                    <div className="bg-[#121212] border border-white/10 rounded-4xl w-full max-w-md p-8 shadow-2xl">
                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[#8ff5ff]">settings_input_composite</span>
+                            <span className="material-symbols-outlined text-primary">settings_input_composite</span>
                             {editingId ? 'Modify Operator' : 'Register New Operator'}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -166,7 +166,7 @@ export default function UserManagement() {
                                 <input 
                                     type="text" 
                                     required
-                                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-[#8ff5ff]/50 transition-all"
+                                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-primary/50 transition-all"
                                     value={formData.name}
                                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                                 />
@@ -176,7 +176,7 @@ export default function UserManagement() {
                                 <input 
                                     type="email" 
                                     required
-                                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-[#8ff5ff]/50 transition-all"
+                                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-primary/50 transition-all"
                                     value={formData.email}
                                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                                 />
@@ -187,7 +187,7 @@ export default function UserManagement() {
                                     <input 
                                         type="password" 
                                         required
-                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-[#8ff5ff]/50 transition-all"
+                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-primary/50 transition-all"
                                         value={formData.password}
                                         onChange={(e) => setFormData({...formData, password: e.target.value})}
                                     />
@@ -197,7 +197,7 @@ export default function UserManagement() {
                                 <div>
                                     <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-1.5 ml-1">Designation</label>
                                     <select 
-                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-[#8ff5ff]/50 transition-all"
+                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-primary/50 transition-all"
                                         value={formData.role}
                                         onChange={(e) => setFormData({...formData, role: e.target.value})}
                                     >
@@ -210,7 +210,7 @@ export default function UserManagement() {
                                     <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-1.5 ml-1">Uplink Code (Phone)</label>
                                     <input 
                                         type="text" 
-                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-[#8ff5ff]/50 transition-all"
+                                        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-primary/50 transition-all"
                                         value={formData.phone_number}
                                         onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
                                     />
@@ -226,7 +226,7 @@ export default function UserManagement() {
                                 </button>
                                 <button 
                                     type="submit" 
-                                    className="flex-1 px-6 py-3 bg-[#8ff5ff] text-black font-bold rounded-xl hover:bg-white transition-all shadow-lg shadow-[#8ff5ff]/10"
+                                    className="flex-1 px-6 py-3 bg-primary text-black font-bold rounded-xl hover:bg-white transition-all shadow-lg shadow-primary/10"
                                 >
                                     {editingId ? 'Update' : 'Confirm'}
                                 </button>

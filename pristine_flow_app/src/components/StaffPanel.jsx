@@ -1,19 +1,18 @@
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 
 export default function StaffPanel() {
-  const { orders, machines, startMachineCycle, stopMachineCycle, logout } = useApp();
+  const { orders, machines, stopMachineCycle, logout } = useApp();
 
   const activeOrders = orders?.filter(o => o.status !== 'Delivered' && o.status !== 'Completed') || [];
-  const runningMachines = machines?.filter(m => m.status === 'Running') || [];
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans']">
       {/* Top Bar */}
-      <nav className="fixed top-0 left-0 w-full h-16 bg-[#111]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 z-[100]">
+      <nav className="fixed top-0 left-0 w-full h-16 bg-[#111]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 z-100">
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-[#8ff5ff] rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="material-symbols-outlined text-black text-xl">electric_bolt</span>
           </div>
           <span className="font-bold tracking-tighter uppercase">Staff Operations Node</span>
@@ -40,17 +39,17 @@ export default function StaffPanel() {
                   <h2 className="text-xl font-bold uppercase tracking-tight">Active Protocol Queue</h2>
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Orders requiring immediate processing</p>
                 </div>
-                <div className="bg-white/5 px-4 py-1.5 rounded-full text-[10px] font-bold text-[#8ff5ff]">
+                <div className="bg-white/5 px-4 py-1.5 rounded-full text-[10px] font-bold text-primary">
                   {activeOrders.length} Protocols Pending
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeOrders.map(order => (
-                  <div key={order.id} className="bg-[#121212] border border-white/5 rounded-2xl p-5 hover:border-[#8ff5ff]/30 transition-all group">
+                  <div key={order.id} className="bg-[#121212] border border-white/5 rounded-2xl p-5 hover:border-primary/30 transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <span className="text-[10px] font-mono text-[#8ff5ff] font-bold">{order.id}</span>
+                        <span className="text-[10px] font-mono text-primary font-bold">{order.id}</span>
                         <h3 className="font-bold text-lg mt-0.5">{order.customer}</h3>
                       </div>
                       <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${
@@ -66,7 +65,7 @@ export default function StaffPanel() {
                       </div>
                       <div className="flex-1">
                         <div className="text-[8px] text-slate-500 uppercase tracking-widest mb-1">Status</div>
-                        <div className="text-xs font-bold text-[#8ff5ff] animate-pulse">{order.status}</div>
+                        <div className="text-xs font-bold text-primary animate-pulse">{order.status}</div>
                       </div>
                     </div>
                     <Link 
@@ -85,7 +84,7 @@ export default function StaffPanel() {
           <div className="space-y-6">
             <section className="bg-[#121212] border border-white/5 rounded-3xl p-6 sticky top-24">
               <div className="flex items-center gap-3 mb-8">
-                <span className="material-symbols-outlined text-[#8ff5ff]">precision_manufacturing</span>
+                <span className="material-symbols-outlined text-primary">precision_manufacturing</span>
                 <div>
                   <h2 className="font-bold uppercase tracking-tight">Unit Monitoring</h2>
                   <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Real-time Machinery Telemetry</p>
@@ -94,11 +93,11 @@ export default function StaffPanel() {
 
               <div className="space-y-4">
                 {machines?.map(machine => (
-                  <div key={machine.id} className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
+                  <div key={machine.id} className="bg-white/3 border border-white/5 rounded-2xl p-4">
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          machine.status === 'Running' ? 'bg-[#8ff5ff]/10 text-[#8ff5ff]' : 'bg-white/5 text-slate-500'
+                          machine.status === 'Running' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-slate-500'
                         }`}>
                           <span className="material-symbols-outlined text-lg">
                             {machine.type.includes('Washing') ? 'local_laundry_service' : 'dry_cleaning'}
@@ -120,10 +119,10 @@ export default function StaffPanel() {
                         <div className="bg-black/40 rounded-lg p-2.5">
                           <div className="flex justify-between text-[8px] uppercase font-bold text-slate-500 mb-1">
                             <span>Processing Pulse</span>
-                            <span className="text-[#8ff5ff]">{machine.assigned_order_id}</span>
+                            <span className="text-primary">{machine.assigned_order_id}</span>
                           </div>
                           <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#8ff5ff] w-2/3 animate-[shimmer_2s_infinite_linear]"></div>
+                            <div className="h-full bg-primary w-2/3 animate-[shimmer_2s_infinite_linear]"></div>
                           </div>
                         </div>
                         <button 
@@ -149,7 +148,7 @@ export default function StaffPanel() {
               </div>
 
               <div className="mt-8 pt-6 border-t border-white/5">
-                <Link to="/machinery" className="text-[10px] font-bold text-[#8ff5ff] hover:underline uppercase tracking-widest flex items-center gap-2">
+                <Link to="/machinery" className="text-[10px] font-bold text-primary hover:underline uppercase tracking-widest flex items-center gap-2">
                   View Comprehensive Telemetry <span className="material-symbols-outlined text-xs">open_in_new</span>
                 </Link>
               </div>

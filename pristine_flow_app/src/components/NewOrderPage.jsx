@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -59,7 +59,7 @@ export default function NewOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white font-['Plus_Jakarta_Sans'] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] pt-32 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
         {!createdOrder ? (
           <div className="bg-[#121212] rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl flex flex-col md:flex-row">
@@ -68,8 +68,8 @@ export default function NewOrderPage() {
                 <Link to="/admin" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all mb-8">
                     <span className="material-symbols-outlined text-sm">arrow_back</span>
                 </Link>
-                <div className="w-14 h-14 rounded-2xl bg-[#8ff5ff]/10 flex items-center justify-center mb-8">
-                    <span className="material-symbols-outlined text-[#8ff5ff] text-3xl">add_shopping_cart</span>
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-8">
+                    <span className="material-symbols-outlined text-primary text-3xl">add_shopping_cart</span>
                 </div>
                 <h1 className="text-3xl font-black tracking-tighter mb-4">New Protocol</h1>
                 <p className="text-slate-500 text-sm leading-relaxed mb-10 font-medium">Initialize a new service entry. All data is synchronized in real-time with the central hub.</p>
@@ -77,7 +77,7 @@ export default function NewOrderPage() {
                 <div className="space-y-4">
                     <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Estimated Amount</p>
-                        <p className="text-3xl font-black text-[#8ff5ff]">₹{estimatedPrice}</p>
+                        <p className="text-3xl font-black text-primary">₹{estimatedPrice}</p>
                     </div>
                     <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Service Node</p>
@@ -97,7 +97,7 @@ export default function NewOrderPage() {
                             type="text" 
                             value={formData.customer_name}
                             onChange={(e) => setFormData({...formData, customer_name: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#8ff5ff]/30 transition-all font-bold text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm"
                             placeholder="Full Name"
                         />
                     </div>
@@ -108,7 +108,7 @@ export default function NewOrderPage() {
                             type="tel" 
                             value={formData.phone}
                             onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#8ff5ff]/30 transition-all font-bold text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm"
                             placeholder="+91"
                         />
                     </div>
@@ -120,7 +120,7 @@ export default function NewOrderPage() {
                         <select 
                             value={formData.service_type}
                             onChange={(e) => setFormData({...formData, service_type: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#8ff5ff]/30 transition-all font-bold text-sm appearance-none cursor-pointer"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm appearance-none cursor-pointer"
                         >
                             <option value="Wash & Fold">Wash & Fold</option>
                             <option value="Dry Clean">Dry Cleaning</option>
@@ -157,7 +157,7 @@ export default function NewOrderPage() {
                             <button 
                                 type="button"
                                 onClick={() => setFormData({...formData, items_count: formData.items_count + 1})}
-                                className="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl text-[#8ff5ff] transition-colors"
+                                className="w-12 h-12 flex items-center justify-center hover:bg-white/5 rounded-xl text-primary transition-colors"
                             >
                                 <span className="material-symbols-outlined text-sm">add</span>
                             </button>
@@ -169,7 +169,7 @@ export default function NewOrderPage() {
                             type="text" 
                             value={formData.notes}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#8ff5ff]/30 transition-all font-bold text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm"
                             placeholder="Special requirements..."
                         />
                     </div>
@@ -180,14 +180,14 @@ export default function NewOrderPage() {
                     <textarea 
                         value={formData.address}
                         onChange={(e) => setFormData({...formData, address: e.target.value})}
-                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#8ff5ff]/30 transition-all font-bold text-sm h-32 resize-none"
+                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm h-32 resize-none"
                         placeholder="Street, Building, Flat number..."
                     />
                 </div>
 
                 <button 
                   disabled={isSubmitting}
-                  className="w-full py-6 bg-[#8ff5ff] text-black font-black rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#8ff5ff]/10 flex items-center justify-center gap-3 active:scale-[0.98] group"
+                  className="w-full py-6 bg-primary text-black font-black rounded-2xl hover:bg-white transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 active:scale-[0.98] group"
                 >
                   {isSubmitting ? (
                     <div className="animate-spin h-6 w-6 border-t-2 border-b-2 border-black rounded-full"></div>
@@ -207,7 +207,7 @@ export default function NewOrderPage() {
               <span className="material-symbols-outlined text-6xl">check_circle</span>
             </div>
             <h2 className="text-4xl font-black tracking-tighter mb-4">Protocol Active</h2>
-            <p className="text-slate-500 font-bold mb-12">Verification Code: <span className="text-[#8ff5ff] font-mono">{createdOrder.order_id}</span></p>
+            <p className="text-slate-500 font-bold mb-12">Verification Code: <span className="text-primary font-mono">{createdOrder.order_id}</span></p>
 
             <div ref={qrRef} className="bg-white p-8 rounded-[3rem] inline-block mb-12 shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-white/10 scale-110">
               <QRCodeCanvas 

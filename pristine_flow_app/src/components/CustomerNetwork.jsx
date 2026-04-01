@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 
 export default function CustomerNetwork() {
@@ -42,7 +42,7 @@ export default function CustomerNetwork() {
       </nav>
 
       {/* Main Content */}
-      <main className="ml-24 p-10 min-h-screen bg-[#080808] text-white animate-in fade-in duration-1000">
+      <main className="ml-24 p-10 min-h-screen bg-background text-white animate-in fade-in duration-1000">
         {/* Header & Search */}
         <header className="flex justify-between items-end mb-12">
           <div>
@@ -65,7 +65,7 @@ export default function CustomerNetwork() {
 
         {/* Stats */}
         <div className="grid grid-cols-12 gap-6 mb-12">
-          <div className="col-span-12 lg:col-span-4 bg-[#121212] p-8 rounded-[2rem] flex flex-col justify-between relative overflow-hidden group border border-white/5">
+          <div className="col-span-12 lg:col-span-4 bg-[#121212] p-8 rounded-4xl flex flex-col justify-between relative overflow-hidden group border border-white/5">
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 blur-[80px] rounded-full group-hover:bg-cyan-500/20 transition-all"></div>
             <div className="flex justify-between items-start relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center">
@@ -81,7 +81,7 @@ export default function CustomerNetwork() {
         </div>
 
         {/* List */}
-        <section className="bg-[#121212] rounded-[2rem] overflow-hidden border border-white/5">
+        <section className="bg-[#121212] rounded-4xl overflow-hidden border border-white/5">
           <div className="p-8 flex justify-between items-center border-b border-white/5">
             <h2 className="text-xl font-bold">Member Directory</h2>
           </div>
@@ -96,9 +96,9 @@ export default function CustomerNetwork() {
                   <th className="px-8 py-6 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.03]">
+              <tbody className="divide-y divide-white/3">
                 {filteredCustomers.map(customer => (
-                  <tr key={customer.phone} className="group hover:bg-white/[0.02] transition-colors">
+                  <tr key={customer.phone} className="group hover:bg-white/2 transition-colors">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold">
@@ -118,7 +118,7 @@ export default function CustomerNetwork() {
                       </span>
                     </td>
                     <td className="px-8 py-6 font-medium text-sm">{customer.orders} Units</td>
-                    <td className="px-8 py-6 font-bold text-[#8ff5ff]">{customer.spent}</td>
+                    <td className="px-8 py-6 font-bold text-primary">{customer.spent}</td>
                     <td className="px-8 py-6 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { AppProvider, useApp } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+import { useApp } from './context/useApp';
 import { Toaster } from 'react-hot-toast';
 
 import CustomerHome from './components/CustomerHome';
@@ -20,7 +21,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (!user) return <Login />;
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen bg-[#080808] text-white flex flex-center items-center justify-center font-['Plus_Jakarta_Sans'] font-bold uppercase tracking-widest text-xs">
+      <div className="min-h-screen bg-background text-white flex flex-center items-center justify-center font-['Plus_Jakarta_Sans'] font-bold uppercase tracking-widest text-xs">
         Access Denied: Protocol Violation
       </div>
     );
@@ -28,22 +29,21 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-// A simple navigation layer
 function NavigationWrapper({ children }) {
   const { user, logout } = useApp();
   return (
     <>
-      <div className="fixed top-0 right-0 z-[9999] bg-[#111]/90 text-white p-2 flex items-center gap-4 border border-white/10 rounded-bl-xl text-xs backdrop-blur-md shadow-lg">
+      <div className="fixed top-0 right-0 z-9999 bg-[#111]/90 text-white p-2 flex items-center gap-4 border border-white/10 rounded-bl-xl text-xs backdrop-blur-md shadow-lg">
         {user ? (
           <>
-            <span className="text-[#8ff5ff] font-semibold">[{user.role.toUpperCase()}] {user.name}</span>
+            <span className="text-primary font-semibold">[{user.role.toUpperCase()}] {user.name}</span>
             <button onClick={logout} className="text-red-400 hover:text-red-300 font-bold">Logout</button>
-            <div className="h-4 w-[1px] bg-white/10 mx-1"></div>
+            <div className="h-4 w-px bg-white/10 mx-1"></div>
             <Link to="/" className="text-slate-400 hover:text-white">Home</Link>
             {user.role === 'admin' && (
               <>
-                <Link to="/admin" className="text-[#8ff5ff] hover:text-white">Dashboard</Link>
-                <Link to="/admin/users" className="text-[#8ff5ff] hover:text-white">Users</Link>
+                <Link to="/admin" className="text-primary hover:text-white">Dashboard</Link>
+                <Link to="/admin/users" className="text-primary hover:text-white">Users</Link>
               </>
             )}
             {(user.role === 'admin' || user.role === 'staff') && (
@@ -51,7 +51,7 @@ function NavigationWrapper({ children }) {
             )}
           </>
         ) : (
-          <Link to="/login" className="text-[#8ff5ff] hover:text-white px-2">System Login</Link>
+          <Link to="/login" className="text-primary hover:text-white px-2">System Login</Link>
         )}
       </div>
       {children}

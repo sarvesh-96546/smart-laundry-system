@@ -13,7 +13,6 @@ const getMachinery = async (req, res) => {
 
         if (error) throw error;
 
-        // Map it to include the assigned customer name from the joined orders table
         const machines = machinesData.map(m => ({
             ...m,
             assigned_customer: m.orders ? m.orders.customer_name : null

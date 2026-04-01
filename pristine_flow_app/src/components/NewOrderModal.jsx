@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { QRCodeCanvas } from 'qrcode.react';
 
 export default function NewOrderModal({ isOpen, onClose }) {
@@ -34,7 +34,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
         amount: estimatedPrice
       });
       setCreatedOrder(result);
-    } catch (err) {
+    } catch {
       alert('Sync Failure: Protocol rejected by core engine.');
     } finally {
       setIsSubmitting(false);
@@ -51,7 +51,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-500">
+    <div className="fixed inset-0 z-10000 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-500">
       <div className="bg-[#0f0f0f] border border-white/5 w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(143,245,255,0.05)] relative">
         <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all hover:rotate-90">
           <span className="material-symbols-outlined text-sm">close</span>
@@ -61,8 +61,8 @@ export default function NewOrderModal({ isOpen, onClose }) {
           <div className="flex flex-col md:flex-row h-full">
             {/* Left Info Panel */}
             <div className="w-full md:w-1/3 bg-[#121212] p-8 border-r border-white/5">
-                <div className="w-12 h-12 rounded-2xl bg-[#8ff5ff]/10 flex items-center justify-center mb-6">
-                    <span className="material-symbols-outlined text-[#8ff5ff]">add_shopping_cart</span>
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                    <span className="material-symbols-outlined text-primary">add_shopping_cart</span>
                 </div>
                 <h2 className="text-2xl font-bold mb-3">New Protocol</h2>
                 <p className="text-slate-500 text-sm leading-relaxed mb-8">Initialize a new service entry. All data is synchronized in real-time with the central hub.</p>
@@ -70,7 +70,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                 <div className="space-y-4">
                     <div className="bg-white/5 p-4 rounded-2xl">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Est. Amount</p>
-                        <p className="text-2xl font-bold text-[#8ff5ff]">₹{estimatedPrice}</p>
+                        <p className="text-2xl font-bold text-primary">₹{estimatedPrice}</p>
                     </div>
                     <div className="bg-white/5 p-4 rounded-2xl">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Service Node</p>
@@ -90,7 +90,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                             type="text" 
                             value={formData.customer_name}
                             onChange={(e) => setFormData({...formData, customer_name: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#8ff5ff]/30 transition-all text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm"
                             placeholder="John Doe"
                         />
                     </div>
@@ -101,7 +101,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                             type="tel" 
                             value={formData.phone}
                             onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#8ff5ff]/30 transition-all text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm"
                             placeholder="+91"
                         />
                     </div>
@@ -113,7 +113,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                         <select 
                             value={formData.service_type}
                             onChange={(e) => setFormData({...formData, service_type: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#8ff5ff]/30 transition-all text-sm appearance-none"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm appearance-none"
                         >
                             <option value="Wash & Fold">Wash & Fold</option>
                             <option value="Dry Clean">Dry Cleaning</option>
@@ -150,7 +150,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                             <button 
                                 type="button"
                                 onClick={() => setFormData({...formData, items_count: formData.items_count + 1})}
-                                className="w-10 h-10 flex items-center justify-center hover:bg-white/5 rounded-xl text-[#8ff5ff]"
+                                className="w-10 h-10 flex items-center justify-center hover:bg-white/5 rounded-xl text-primary"
                             >
                                 <span className="material-symbols-outlined text-sm">add</span>
                             </button>
@@ -162,7 +162,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
                             type="text" 
                             value={formData.notes || ''}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#8ff5ff]/30 transition-all text-sm"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm"
                             placeholder="Special instructions..."
                         />
                     </div>
@@ -173,14 +173,14 @@ export default function NewOrderModal({ isOpen, onClose }) {
                     <textarea 
                         value={formData.address}
                         onChange={(e) => setFormData({...formData, address: e.target.value})}
-                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#8ff5ff]/30 transition-all text-sm h-20 resize-none"
+                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm h-20 resize-none"
                         placeholder="Street, Building, Flat..."
                     />
                 </div>
 
                 <button 
                   disabled={isSubmitting}
-                  className="w-full py-5 bg-[#8ff5ff] text-black font-bold rounded-[1.5rem] hover:bg-white transition-all shadow-xl shadow-[#8ff5ff]/10 flex items-center justify-center gap-3 active:scale-[0.98]"
+                  className="w-full py-5 bg-primary text-black font-bold rounded-3xl hover:bg-white transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 active:scale-[0.98]"
                 >
                   {isSubmitting ? (
                     <div className="animate-spin h-5 w-5 border-t-2 border-b-2 border-black rounded-full"></div>
@@ -200,7 +200,7 @@ export default function NewOrderModal({ isOpen, onClose }) {
               <span className="material-symbols-outlined text-5xl">check_circle</span>
             </div>
             <h2 className="text-3xl font-bold mb-2">Protocol Active</h2>
-            <p className="text-slate-500 text-sm mb-10">Verification Code: <span className="text-[#8ff5ff] font-mono font-bold">{createdOrder.order_id}</span></p>
+            <p className="text-slate-500 text-sm mb-10">Verification Code: <span className="text-primary font-mono font-bold">{createdOrder.order_id}</span></p>
 
             <div ref={qrRef} className="bg-white p-6 rounded-[2.5rem] inline-block mb-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 scale-110">
               <QRCodeCanvas 

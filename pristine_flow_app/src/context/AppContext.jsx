@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 import { authClient, useSession } from '../lib/auth-client';
 
-const AppContext = createContext();
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-export const useApp = () => useContext(AppContext);
+import { AppContext } from './useApp';
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -21,19 +21,16 @@ export const AppProvider = ({ children }) => {
     chart_data: []
   });
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     const headers = {
       'Content-Type': 'application/json'
     };
     const token = localStorage.getItem('token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
-  };
+  }, []);
 
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/customers`);
       const data = await res.json();
@@ -41,9 +38,9 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('Fetch customers error:', err);
     }
-  };
+  }, []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/stats`, { headers: getAuthHeaders() });
       if (!res.ok) return;
@@ -54,9 +51,9 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('Stats fetch error:', err);
     }
-  };
+  }, [getAuthHeaders]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() });
       if (!res.ok) return;
@@ -73,11 +70,11 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('Fetch orders error:', err);
     }
-  };
+  }, [getAuthHeaders]);
 
   const [machines, setMachines] = useState([]);
 
-  const fetchMachinery = async () => {
+  const fetchMachinery = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/machinery`, { headers: getAuthHeaders() });
       if (!res.ok) return;
@@ -86,7 +83,7 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('Fetch machinery error:', err);
     }
-  };
+  }, [getAuthHeaders]);
 
   const startMachineCycle = async (machineId, orderId, duration = 30) => {
     try {
@@ -101,7 +98,7 @@ export const AppProvider = ({ children }) => {
         fetchMachinery();
         fetchOrders();
       }
-    } catch (err) {
+    } catch {
       toast.error('Cycle initiation failed');
     }
   };
@@ -118,7 +115,7 @@ export const AppProvider = ({ children }) => {
         fetchOrders();
         fetchStats();
       }
-    } catch (err) {
+    } catch {
       toast.error('Manual override failed');
     }
   };
@@ -138,13 +135,12 @@ export const AppProvider = ({ children }) => {
       fetchCustomers();
     });
 
-    newSocket.on('status_update', (data) => {
-      // toast(`Order ${data.order_id}: ${data.new_status}`, { icon: '🔄' });
+    newSocket.on('status_update', () => {
       fetchOrders();
       fetchStats();
     });
 
-    newSocket.on('machine_update', (data) => {
+    newSocket.on('machine_update', () => {
       fetchMachinery();
     });
 
@@ -153,14 +149,14 @@ export const AppProvider = ({ children }) => {
     });
 
     return () => newSocket.disconnect();
-  }, []);
+  }, [fetchStats, fetchOrders, fetchCustomers, fetchMachinery]);
 
   useEffect(() => {
     fetchStats();
     fetchOrders();
     fetchCustomers();
     fetchMachinery();
-  }, []);
+  }, [fetchStats, fetchOrders, fetchCustomers, fetchMachinery]);
 
   const [prices, setPrices] = useState({
     base: 40,
@@ -183,7 +179,6 @@ export const AppProvider = ({ children }) => {
       };
       setUser(formattedUser);
     } else if (!isSessionPending) {
-        // Fallback to existing Supabase session if no Better Auth session
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) {
                 supabase.from('users').select('role').eq('id', session.user.id).single().then(({ data: userData }) => {
@@ -203,7 +198,6 @@ export const AppProvider = ({ children }) => {
   }, [sessionData, isSessionPending]);
 
   useEffect(() => {
-    // Listen to Auth State changes (Supabase Fallback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!sessionData?.user && session) {
          const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
@@ -241,14 +235,13 @@ export const AppProvider = ({ children }) => {
         toast.error(data.message || 'Login failed');
         return null;
       }
-    } catch (err) {
+    } catch {
       toast.error('Connection to auth server failed');
       return null;
     }
   };
 
   const logout = async () => {
-    // Sign out from both
     await authClient.signOut();
     await supabase.auth.signOut();
     
@@ -280,8 +273,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const toggleMachineStatus = (id) => {
-    // Legacy toggle, mostly handled by Start/Stop now
+  const toggleMachineStatus = () => {
     toast('Use Start/Stop for mission-critical cycles', { icon: '⚠️' });
   };
 

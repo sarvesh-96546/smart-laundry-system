@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const STAGES = ['Received', 'Washing', 'Drying', 'Ironing', 'Ready for Pickup'];
 
-// Helper to calculate remaining time
 const getRemainingTime = (endTime) => {
   if (!endTime) return null;
   const diff = new Date(endTime) - new Date();
@@ -15,7 +14,7 @@ const getRemainingTime = (endTime) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-function MachineCard({ machine, onStart, onStop }) {
+function MachineCard({ machine, onStop }) {
   const [timeLeft, setTimeLeft] = useState(getRemainingTime(machine.expected_end_time));
 
   useEffect(() => {
@@ -36,21 +35,21 @@ function MachineCard({ machine, onStart, onStop }) {
   const isMaintenance = machine.status === 'Maintenance' || machine.status === 'Under Maintenance';
 
   return (
-    <div className={`relative group overflow-hidden bg-[#121212] rounded-[2rem] p-8 border transition-all duration-500 scale-100 hover:scale-[1.02] ${
-      isRunning ? 'border-[#8ff5ff]/30 shadow-[0_0_50px_rgba(143,245,255,0.05)]' : 
+    <div className={`relative group overflow-hidden bg-[#121212] rounded-4xl p-8 border transition-all duration-500 scale-100 hover:scale-[1.02] ${
+      isRunning ? 'border-primary/30 shadow-[0_0_50px_rgba(143,245,255,0.05)]' : 
       isMaintenance ? 'border-yellow-500/20' : 'border-white/5'
     }`}>
       {/* Animated Background Elements */}
       {isRunning && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#8ff5ff] to-transparent animate-shimmer"></div>
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#8ff5ff]/5 to-transparent"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent animate-shimmer"></div>
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-primary/5 to-transparent"></div>
         </div>
       )}
 
       <div className="flex justify-between items-start mb-8 relative z-10">
         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-700 ${
-          isRunning ? 'bg-[#8ff5ff] text-black rotate-12' : 'bg-white/5 text-slate-500 rotate-0'
+          isRunning ? 'bg-primary text-black rotate-12' : 'bg-white/5 text-slate-500 rotate-0'
         }`}>
           <span className={`material-symbols-outlined text-3xl ${isRunning ? 'animate-spin-slow' : ''}`}>
             {machine.type.includes('Washer') ? 'local_laundry_service' : 
@@ -72,14 +71,14 @@ function MachineCard({ machine, onStart, onStop }) {
           <span className="text-3xl font-bold tracking-tighter">
             {isRunning ? timeLeft || '0:00' : 'IDLE'}
           </span>
-          {isRunning && <span className="text-xs text-[#8ff5ff] font-bold mb-1.5 animate-pulse">REMAINING</span>}
+          {isRunning && <span className="text-xs text-primary font-bold mb-1.5 animate-pulse">REMAINING</span>}
         </div>
 
         {isRunning ? (
           <div className="space-y-4">
             <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
                <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Active Protocol</p>
-               <p className="font-bold text-sm text-[#8ff5ff]">{machine.assigned_order_id}</p>
+               <p className="font-bold text-sm text-primary">{machine.assigned_order_id}</p>
                <p className="text-[10px] text-slate-400 mt-1">{machine.assigned_customer}</p>
             </div>
             <button 
@@ -103,7 +102,7 @@ function MachineCard({ machine, onStart, onStop }) {
              </div>
              <button 
                disabled={isMaintenance}
-               className="w-full py-4 bg-white text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#8ff5ff] transition-all disabled:opacity-30"
+               className="w-full py-4 bg-white text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-all disabled:opacity-30"
              >
                Ready for Load
              </button>
@@ -134,8 +133,8 @@ export default function Machinery() {
 
   return (
     <>
-      <main className="min-h-screen bg-[#080808] text-white font-['Plus_Jakarta_Sans'] pb-20">
-        <header className="fixed top-0 right-0 left-0 z-[100] bg-[#080808]/80 backdrop-blur-3xl border-b border-white/5">
+      <main className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] pb-20">
+        <header className="fixed top-0 right-0 left-0 z-100 bg-background/80 backdrop-blur-3xl border-b border-white/5">
           <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-6">
             <div className="flex items-center gap-4">
               <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -148,7 +147,7 @@ export default function Machinery() {
             </div>
             <button 
               onClick={() => setIsScanOpen(true)}
-              className="px-6 py-3 bg-[#8ff5ff] text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all flex items-center gap-3"
+              className="px-6 py-3 bg-primary text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all flex items-center gap-3"
             >
               <span className="material-symbols-outlined text-lg">qr_code_scanner</span>
               Scan Protocol
@@ -161,7 +160,7 @@ export default function Machinery() {
           <section className="xl:col-span-4 lg:sticky lg:top-32 h-fit">
             <div className="flex items-center justify-between mb-8">
                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Operational Queue</h3>
-               <span className="text-[10px] font-bold bg-[#8ff5ff]/10 text-[#8ff5ff] px-3 py-1 rounded-full uppercase">
+               <span className="text-[10px] font-bold bg-primary/10 text-primary px-3 py-1 rounded-full uppercase">
                  {pendingTasks.length} NODES
                </span>
             </div>
@@ -172,7 +171,7 @@ export default function Machinery() {
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
                   className={`relative group p-6 rounded-3xl border transition-all cursor-pointer ${
-                    selectedTask?.id === task.id ? 'bg-[#1a1a1a] border-[#8ff5ff]/50' : 'bg-[#111] border-white/5 hover:border-white/10'
+                    selectedTask?.id === task.id ? 'bg-[#1a1a1a] border-primary/50' : 'bg-[#111] border-white/5 hover:border-white/10'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -189,7 +188,7 @@ export default function Machinery() {
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{task.status}</p>
                     <div className="flex gap-1">
                        {[1,2,3,4,5].map(i => (
-                         <div key={i} className={`w-1 h-3 rounded-full ${i <= (STAGES.indexOf(task.status) + 1) ? 'bg-[#8ff5ff]' : 'bg-white/5'}`}></div>
+                         <div key={i} className={`w-1 h-3 rounded-full ${i <= (STAGES.indexOf(task.status) + 1) ? 'bg-primary' : 'bg-white/5'}`}></div>
                        ))}
                     </div>
                   </div>
@@ -204,7 +203,7 @@ export default function Machinery() {
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Machinery Network</h3>
                 <div className="flex gap-4">
                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#8ff5ff] animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                       <span className="text-[10px] font-bold text-slate-500 uppercase">Online</span>
                    </div>
                 </div>
@@ -219,7 +218,7 @@ export default function Machinery() {
                      onStop={stopMachineCycle}
                    />
                    {!machine.assigned_order_id && selectedTask && (
-                     <div className="absolute inset-0 bg-[#8ff5ff] text-black rounded-[2rem] flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-20 cursor-pointer pointer-events-auto"
+                     <div className="absolute inset-0 bg-primary text-black rounded-4xl flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-20 cursor-pointer pointer-events-auto"
                           onClick={() => handleStart(machine.id, selectedTask.id)}>
                         <span className="material-symbols-outlined text-4xl mb-2">move_to_inbox</span>
                         <p className="text-xs font-bold uppercase tracking-widest">Assign Protocol</p>
@@ -235,13 +234,13 @@ export default function Machinery() {
 
       {/* Simulated Scanner Modal */}
       {isScanOpen && (
-        <div className="fixed inset-0 z-[20000] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-20000 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
            <div className="w-full max-w-lg bg-[#111] border border-white/10 rounded-[3rem] p-12 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#8ff5ff] to-transparent animate-shimmer"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent animate-shimmer"></div>
               
-              <div className="w-48 h-48 border-2 border-dashed border-[#8ff5ff]/30 rounded-3xl mx-auto mb-10 flex items-center justify-center relative">
-                 <div className="absolute inset-4 border border-[#8ff5ff]/50 rounded-2xl animate-pulse"></div>
-                 <span className="material-symbols-outlined text-6xl text-[#8ff5ff]">qr_code_2</span>
+              <div className="w-48 h-48 border-2 border-dashed border-primary/30 rounded-3xl mx-auto mb-10 flex items-center justify-center relative">
+                 <div className="absolute inset-4 border border-primary/50 rounded-2xl animate-pulse"></div>
+                 <span className="material-symbols-outlined text-6xl text-primary">qr_code_2</span>
               </div>
 
               <h2 className="text-2xl font-bold mb-4">Awaiting Signal...</h2>
@@ -262,7 +261,7 @@ export default function Machinery() {
                       toast.success(`Protocol ${pendingTasks[0].id} synced via scan`);
                     }
                   }}
-                  className="flex-1 py-4 bg-[#8ff5ff] text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all"
+                  className="flex-1 py-4 bg-primary text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all"
                  >
                    Simulate Scan
                  </button>

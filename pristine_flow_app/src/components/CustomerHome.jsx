@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function CustomerHome() {
-  const { stats, orders, machines, prices } = useApp();
+  const { stats, orders, machines, prices, API_BASE_URL } = useApp();
   const [counts, setCounts] = React.useState({ orders: 0, machines: 0, customers: 0, delivery: 0 });
   const [trackInput, setTrackInput] = React.useState('');
   const [isTracking, setIsTracking] = React.useState(false);
@@ -33,13 +33,11 @@ export default function CustomerHome() {
     const input = trackInput.trim();
 
     try {
-      // Check if it looks like an Order ID
       if (input.toUpperCase().startsWith('LD-')) {
         navigate(`/order/${input.toUpperCase()}`);
       } 
-      // Check if it looks like a phone number (10 digits)
       else if (/^\d{10}$/.test(input)) {
-        const res = await fetch(`${useApp().API_BASE_URL}/api/orders/phone/${input}`);
+        const res = await fetch(`${API_BASE_URL}/api/orders/phone/${input}`);
         const data = await res.json();
         if (data.order_id) {
           navigate(`/order/${data.order_id}`);
@@ -49,7 +47,7 @@ export default function CustomerHome() {
       } else {
         toast.error('Invalid format. Use LD-XXXXX or 10-digit Phone Number');
       }
-    } catch (err) {
+    } catch {
       toast.error('Connection failure while verifying protocol');
     } finally {
       setIsTracking(false);
@@ -58,32 +56,32 @@ export default function CustomerHome() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#080808] text-white font-['Plus_Jakarta_Sans'] overflow-x-hidden selection:bg-[#8ff5ff] selection:text-black">
+      <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] overflow-x-hidden selection:bg-primary selection:text-black">
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#8ff5ff]/5 blur-[120px] rounded-full animate-float"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#3b82f6]/5 blur-[120px] rounded-full animate-float" style={{ animationDelay: '-3s' }}></div>
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-float"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 blur-[120px] rounded-full animate-float" style={{ animationDelay: '-3s' }}></div>
         </div>
 
         {/* Navigation */}
-        <nav className="fixed top-0 w-full z-50 bg-[#080808]/80 backdrop-blur-xl border-b border-white/5">
+        <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
           <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             <div className="flex items-center gap-2 group cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#8ff5ff] to-[#3b82f6] rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
+              <div className="w-10 h-10 bg-linear-to-br from-primary to-tertiary rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
                 <span className="material-symbols-outlined text-black font-bold">water_drop</span>
               </div>
-              <span className="text-xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">PRISTINE FLOW</span>
+              <span className="text-xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-white to-white/60">PRISTINE FLOW</span>
             </div>
             <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
-              <Link to="/pricing" className="text-slate-400 hover:text-[#8ff5ff] transition-colors relative group">
+              <Link to="/pricing" className="text-slate-400 hover:text-primary transition-colors relative group">
                 Services
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#8ff5ff] transition-all group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
               </Link>
-              <a href="#activity" className="text-slate-400 hover:text-[#8ff5ff] transition-colors relative group">
+              <a href="#activity" className="text-slate-400 hover:text-primary transition-colors relative group">
                 Live Feed
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#8ff5ff] transition-all group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
               </a>
-              <Link to="/login" className="bg-white/5 border border-white/10 px-6 py-2.5 rounded-full text-white hover:bg-[#8ff5ff] hover:text-black hover:border-[#8ff5ff] transition-all duration-300">Staff Portal</Link>
+              <Link to="/login" className="bg-white/5 border border-white/10 px-6 py-2.5 rounded-full text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-300">Staff Portal</Link>
             </div>
           </div>
         </nav>
@@ -91,16 +89,16 @@ export default function CustomerHome() {
         {/* Hero Section */}
         <section className="pt-40 pb-20 px-6 max-w-7xl mx-auto relative">
           <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8ff5ff]/10 border border-[#8ff5ff]/20 text-[#8ff5ff] text-xs font-bold mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-6 animate-fade-in">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8ff5ff] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#8ff5ff]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               SYSTEM ONLINE • PORTAL V4.2
             </div>
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 fade-in">
               Next-Gen <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8ff5ff] via-[#3b82f6] to-[#8ff5ff] bg-[length:200%_auto] animate-gradient">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-tertiary to-primary bg-size-[200%_auto] animate-gradient">
                 Fabric Care
               </span>
             </h1>
@@ -108,7 +106,7 @@ export default function CustomerHome() {
               Where molecular science meets luxury garment maintenance. Interactive, real-time tracking for the modern wardrobe.
             </p>
             <div className="flex flex-wrap gap-4 fade-in" style={{ animationDelay: '0.4s' }}>
-              <Link to="/admin/new-order" className="group relative bg-[#8ff5ff] text-black px-8 py-4 rounded-2xl font-black text-lg button-glow overflow-hidden">
+              <Link to="/admin/new-order" className="group relative bg-primary text-black px-8 py-4 rounded-2xl font-black text-lg button-glow overflow-hidden">
                 <span className="relative z-10 flex items-center gap-2">
                   Create New Order
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -145,7 +143,7 @@ export default function CustomerHome() {
         <section className="py-20 px-6 max-w-7xl mx-auto" id="tracking-section">
           <div className="bg-[#121212] rounded-[3rem] p-8 md:p-12 border border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8">
-              <div className="w-24 h-24 bg-[#8ff5ff]/5 blur-3xl rounded-full"></div>
+              <div className="w-24 h-24 bg-primary/5 blur-3xl rounded-full"></div>
             </div>
             
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
@@ -154,8 +152,8 @@ export default function CustomerHome() {
                 <p className="text-slate-500 font-bold">Experience our ultra-transparent tracking system.</p>
               </div>
               <div className="bg-white/5 px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
-                <div className="w-2 h-2 bg-[#8ff5ff] rounded-full animate-pulse"></div>
-                <span className="text-sm font-black tracking-widest text-[#8ff5ff] uppercase">Order #PF-9928</span>
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-sm font-black tracking-widest text-primary uppercase">Order #PF-9928</span>
               </div>
             </div>
 
@@ -172,10 +170,10 @@ export default function CustomerHome() {
                   { stage: 'Ready', icon: 'verified', time: 'Pending' },
                 ].map((step, i) => (
                   <div key={i} className="flex flex-col items-center relative z-10 group/step">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 ${step.active ? 'bg-[#8ff5ff] text-black shadow-[0_0_30px_rgba(143,245,255,0.4)] scale-110' : 'bg-[#1a1a1a] text-slate-600 border border-white/5'}`}>
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 ${step.active ? 'bg-primary text-black shadow-[0_0_30px_rgba(143,245,255,0.4)] scale-110' : 'bg-[#1a1a1a] text-slate-600 border border-white/5'}`}>
                       <span className={`material-symbols-outlined text-2xl ${step.active ? 'animate-spin-slow' : ''}`}>{step.icon}</span>
                     </div>
-                    <span className={`font-black tracking-tight mb-1 ${step.active ? 'text-[#8ff5ff]' : 'text-slate-400'}`}>{step.stage}</span>
+                    <span className={`font-black tracking-tight mb-1 ${step.active ? 'text-primary' : 'text-slate-400'}`}>{step.stage}</span>
                     <span className="text-[10px] uppercase tracking-widest font-bold text-slate-600">{step.time}</span>
                   </div>
                 ))}
@@ -190,7 +188,7 @@ export default function CustomerHome() {
           <div className="lg:col-span-1 bg-[#121212] rounded-[2.5rem] border border-white/5 p-8 flex flex-col h-full" id="activity">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-2xl font-black tracking-tighter">Live Activity</h3>
-              <span className="text-[10px] font-black tracking-widest text-[#8ff5ff] uppercase bg-[#8ff5ff]/10 px-2 py-1 rounded">Real-time</span>
+              <span className="text-[10px] font-black tracking-widest text-primary uppercase bg-primary/10 px-2 py-1 rounded">Real-time</span>
             </div>
             <div className="space-y-6 flex-1 overflow-y-auto pr-2 max-h-[500px] scrollbar-hide">
               {(orders.length > 0 ? orders : [
@@ -199,12 +197,12 @@ export default function CustomerHome() {
                 { id: '100', customer: 'Marcus Miller', service: 'Wash & Fold', status: 'Completed' },
               ]).slice(0, 5).map((order, i) => (
                 <div key={i} className="flex gap-4 group/item">
-                  <div className="w-1 bg-[#8ff5ff]/20 rounded-full group-hover/item:bg-[#8ff5ff] transition-colors"></div>
+                  <div className="w-1 bg-primary/20 rounded-full group-hover/item:bg-primary transition-colors"></div>
                   <div>
                     <div className="text-sm font-black">{order.customer}</div>
                     <div className="text-xs text-slate-500 font-bold mb-1">{order.service} • Order #{order.id}</div>
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-[#8ff5ff]">
-                      <span className="w-1 h-1 bg-[#8ff5ff] rounded-full animate-pulse"></span>
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-primary">
+                      <span className="w-1 h-1 bg-primary rounded-full animate-pulse"></span>
                       {order.status || 'Active'}
                     </div>
                   </div>
@@ -222,13 +220,13 @@ export default function CustomerHome() {
               { title: 'Universal Wash', price: prices?.base || '40', time: '24h', icon: 'laundry', desc: 'Deep-fiber cleaning with eco-friendly bio-detergents.' },
               { title: 'Express Protocol', price: '2x', time: '4h', icon: 'bolt', desc: 'Priority handling for mission-critical laundry needs.' },
             ].map((service, i) => (
-              <div key={i} className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-[#8ff5ff]/20 transition-all group relative overflow-hidden">
+              <div key={i} className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all group relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl">{service.icon}</span>
                 </div>
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-[#1a1a1a] rounded-xl flex items-center justify-center border border-white/5 text-[#8ff5ff] group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 bg-[#1a1a1a] rounded-xl flex items-center justify-center border border-white/5 text-primary group-hover:scale-110 transition-transform">
                       <span className="material-symbols-outlined">{service.icon}</span>
                     </div>
                     <div className="text-right">
@@ -239,11 +237,11 @@ export default function CustomerHome() {
                   <h3 className="text-xl font-bold mb-2">{service.title}</h3>
                   <p className="text-slate-500 text-sm mb-6 leading-relaxed">{service.desc}</p>
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-xs font-black text-[#8ff5ff]">
+                    <div className="flex items-center gap-2 text-xs font-black text-primary">
                       <span className="material-symbols-outlined text-sm">schedule</span>
                       {service.time} ETA
                     </div>
-                    <Link to="/pricing" className="text-xs font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-[#8ff5ff] hover:text-black transition-all">Catalog</Link>
+                    <Link to="/pricing" className="text-xs font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-primary hover:text-black transition-all">Catalog</Link>
                   </div>
                 </div>
               </div>
@@ -256,7 +254,7 @@ export default function CustomerHome() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5">
               <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#8ff5ff]">bar_chart</span>
+                <span className="material-symbols-outlined text-primary">bar_chart</span>
                 Order Volume Trends
               </h3>
               <div className="h-[250px] w-full">
@@ -285,7 +283,7 @@ export default function CustomerHome() {
 
             <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5">
               <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#3b82f6]">query_stats</span>
+                <span className="material-symbols-outlined text-tertiary">query_stats</span>
                 Peak Usage Hours
               </h3>
               <div className="h-[250px] w-full">
@@ -317,7 +315,7 @@ export default function CustomerHome() {
         {/* Customer Tracking Input */}
         <section className="py-20 px-6 max-w-7xl mx-auto" id="tracking-input">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#8ff5ff] to-[#3b82f6] rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+            <div className="absolute -inset-1 bg-linear-to-r from-primary to-tertiary rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
             <div className="relative bg-[#0d0d0d] p-10 md:p-20 rounded-[3rem] border border-white/5 flex flex-col items-center text-center">
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">Locate Your Garments</h2>
               <p className="text-slate-400 mb-10 max-w-xl font-medium">Enter your Order ID or registered Phone Number to see real-time molecular processing status.</p>
@@ -331,11 +329,11 @@ export default function CustomerHome() {
                     value={trackInput}
                     onChange={(e) => setTrackInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-16 focus:outline-none focus:border-[#8ff5ff]/50 focus:bg-white/10 transition-all font-bold text-lg"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-16 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all font-bold text-lg"
                   />
                   <button 
                     onClick={() => toast('QR Scanner initialized... (Demo Only)', { icon: '📸' })}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#8ff5ff]/20 hover:text-[#8ff5ff] transition-all"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-all"
                     title="Scan QR Code"
                   >
                     <span className="material-symbols-outlined text-xl">qr_code_scanner</span>
@@ -344,7 +342,7 @@ export default function CustomerHome() {
                 <button 
                   onClick={handleTrack}
                   disabled={isTracking}
-                  className="bg-[#8ff5ff] text-black px-10 py-5 rounded-2xl font-black text-lg hover:shadow-[0_0_30px_rgba(143,245,255,0.4)] transition-all disabled:opacity-50"
+                  className="bg-primary text-black px-10 py-5 rounded-2xl font-black text-lg hover:shadow-[0_0_30px_rgba(143,245,255,0.4)] transition-all disabled:opacity-50"
                 >
                   {isTracking ? 'Verifying...' : 'Track Now'}
                 </button>
@@ -366,21 +364,21 @@ export default function CustomerHome() {
 
         {/* Feature Grid */}
         <section className="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8" id="services">
-          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-[#8ff5ff]/20 transition-all group overflow-hidden relative">
-            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-[#8ff5ff]/5 rounded-full group-hover:scale-150 transition-transform"></div>
-            <span className="material-symbols-outlined text-[#8ff5ff] text-5xl mb-6 block group-hover:scale-110 transition-transform">biotech</span>
+          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
+            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-primary/5 rounded-full group-hover:scale-150 transition-transform"></div>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6 block group-hover:scale-110 transition-transform">biotech</span>
             <h3 className="text-2xl font-black mb-4 tracking-tight">Molecular Care</h3>
             <p className="text-slate-400 leading-relaxed text-sm font-medium">Quantum sensors detect fiber composition and soil levels to calibrate the perfect wash cycle for every garment.</p>
           </div>
-          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-[#8ff5ff]/20 transition-all group overflow-hidden relative">
-            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-[#3b82f6]/5 rounded-full group-hover:scale-150 transition-transform"></div>
-            <span className="material-symbols-outlined text-[#8ff5ff] text-5xl mb-6 block group-hover:scale-110 transition-transform">potted_plant</span>
+          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
+            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-tertiary/5 rounded-full group-hover:scale-150 transition-transform"></div>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6 block group-hover:scale-110 transition-transform">potted_plant</span>
             <h3 className="text-2xl font-black mb-4 tracking-tight">Eco-Alchemy</h3>
             <p className="text-slate-400 leading-relaxed text-sm font-medium">Bio-degradable components and water-recycling tech reduce our footprint while maximizing garment lifespan.</p>
           </div>
-          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-[#8ff5ff]/20 transition-all group overflow-hidden relative">
-            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-[#8ff5ff]/5 rounded-full group-hover:scale-150 transition-transform"></div>
-            <span className="material-symbols-outlined text-[#8ff5ff] text-5xl mb-6 block group-hover:scale-110 transition-transform">schedule_send</span>
+          <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
+            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-primary/5 rounded-full group-hover:scale-150 transition-transform"></div>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6 block group-hover:scale-110 transition-transform">schedule_send</span>
             <h3 className="text-2xl font-black mb-4 tracking-tight">Quantum Pulse</h3>
             <p className="text-slate-400 leading-relaxed text-sm font-medium">Real-time tracking of your laundry journey from pickup to the final perfectly pressed delivery.</p>
           </div>
@@ -390,7 +388,7 @@ export default function CustomerHome() {
         <footer className="py-20 px-6 border-t border-white/5">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#8ff5ff] rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="material-symbols-outlined text-black text-sm">water_drop</span>
               </div>
               <span className="font-black tracking-tighter">PRISTINE FLOW</span>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -37,10 +37,10 @@ export default function AdminDashboard() {
   const COLORS = ['#8ff5ff', '#ff8f8f', '#8fff9f', '#f5ff8f'];
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white font-['Plus_Jakarta_Sans'] animate-in fade-in duration-1000">
+    <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] animate-in fade-in duration-1000">
       {/* Side Nav */}
       <aside className="fixed left-0 top-0 h-full w-24 bg-[#111] border-r border-white/5 flex flex-col items-center py-8 z-50">
-        <div className="mb-10 text-[#8ff5ff] font-bold text-xl">PF</div>
+        <div className="mb-10 text-primary font-bold text-xl">PF</div>
         <nav className="flex flex-col gap-6">
           <Link to="/admin" className="text-[#8ff5ff] material-symbols-outlined">dashboard</Link>
           <Link to="/machinery" className="text-slate-500 hover:text-white material-symbols-outlined">memory</Link>
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white uppercase">Admin Dashboard</h1>
-            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest opacity-60">System Status: <span className="text-[#8ff5ff] animate-pulse">Operational</span></p>
+            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest opacity-60">System Status: <span className="text-primary animate-pulse">Operational</span></p>
           </div>
           <div className="flex items-center gap-4">
             <Link 
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
                 placeholder="Search protocols..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-[#1a1a1a] border border-white/5 rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:border-[#8ff5ff]/50 w-64 transition-all"
+                className="bg-[#1a1a1a] border border-white/5 rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:border-primary/50 w-64 transition-all"
               />
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-800 overflow-hidden border border-white/10 shrink-0">
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
             </div>
             <Link 
               to="/admin/new-order"
-              className="px-6 py-2.5 bg-[#8ff5ff] text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 text-sm shadow-lg shadow-[#8ff5ff]/10"
+              className="px-6 py-2.5 bg-primary text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 text-sm shadow-lg shadow-primary/10"
             >
               <span className="material-symbols-outlined text-sm">add</span>
               New Order
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
           <div className="bg-[#121212] p-5 rounded-2xl border border-white/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#8ff5ff]/5 blur-3xl -mr-12 -mt-12 group-hover:bg-[#8ff5ff]/10 transition-colors"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors"></div>
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Revenue</p>
             <h3 className="text-2xl font-bold">₹{(stats?.revenue || 0).toLocaleString()}</h3>
             <p className="text-[10px] text-green-400 mt-2 flex items-center gap-1">
@@ -104,10 +104,10 @@ export default function AdminDashboard() {
             <h3 className="text-2xl font-bold">{stats?.in_progress || 0}</h3>
             <p className="text-[10px] text-blue-400 mt-2">Active Protocols</p>
           </div>
-          <div className="bg-[#121212] p-5 rounded-2xl border border-white/5 text-[#8ff5ff]">
+          <div className="bg-[#121212] p-5 rounded-2xl border border-white/5 text-primary">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Ready for Pickup</p>
             <h3 className="text-2xl font-bold">{stats?.ready || 0}</h3>
-            <p className="text-[10px] text-[#8ff5ff]/60 mt-2">Completion Checkpoint</p>
+            <p className="text-[10px] text-primary/60 mt-2">Completion Checkpoint</p>
           </div>
           <div className="bg-[#121212] p-5 rounded-2xl border border-white/5">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Orders</p>
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
               <h2 className="font-bold">Protocol Volume</h2>
               <div className="flex gap-2">
                 <button className="px-3 py-1 bg-white/5 rounded-lg text-xs hover:bg-white/10 transition-colors">Week</button>
-                <button className="px-3 py-1 bg-[#8ff5ff]/10 text-[#8ff5ff] rounded-lg text-xs">Month</button>
+                <button className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs">Month</button>
               </div>
             </div>
             <div className="h-[250px] w-full">
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                   onClick={() => setStatusFilter(status)}
                   className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
                     statusFilter === status 
-                    ? 'bg-[#8ff5ff] text-black shadow-[0_0_15px_rgba(143,245,255,0.2)]' 
+                    ? 'bg-primary text-black shadow-[0_0_15px_rgba(143,245,255,0.2)]' 
                     : 'bg-white/5 text-slate-500 hover:text-white'
                   }`}
                  >
@@ -213,19 +213,19 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>                <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">
-                  <th className="px-8 py-6 cursor-pointer hover:text-[#8ff5ff] transition-colors" onClick={() => handleSort('id')}>ID</th>
-                  <th className="px-8 py-6 cursor-pointer hover:text-[#8ff5ff] transition-colors" onClick={() => handleSort('customer')}>Customer</th>
+                  <th className="px-8 py-6 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('id')}>ID</th>
+                  <th className="px-8 py-6 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('customer')}>Customer</th>
                   <th className="px-8 py-6">Priority</th>
                   <th className="px-8 py-6">Service</th>
-                  <th className="px-8 py-6 cursor-pointer hover:text-[#8ff5ff] transition-colors" onClick={() => handleSort('status')}>Status</th>
-                  <th className="px-8 py-6 text-right cursor-pointer hover:text-[#8ff5ff] transition-colors" onClick={() => handleSort('amount')}>Amount</th>
+                  <th className="px-8 py-6 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('status')}>Status</th>
+                  <th className="px-8 py-6 text-right cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('amount')}>Amount</th>
                   <th className="px-8 py-6 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.03]">
+              <tbody className="divide-y divide-white/3">
                 {filteredOrders.length > 0 ? filteredOrders.map(order => (
-                  <tr key={order.id} className="group hover:bg-white/[0.02] transition-all duration-300">
-                    <td className="px-8 py-6 text-sm font-mono text-[#8ff5ff] font-bold tracking-tighter">{order.id}</td>
+                  <tr key={order.id} className="group hover:bg-white/2 transition-all duration-300">
+                    <td className="px-8 py-6 text-sm font-mono text-primary font-bold tracking-tighter">{order.id}</td>
                     <td className="px-8 py-6">
                        <div className="font-bold text-sm">{order.customer}</div>
                        <div className="text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">{order.phone}</div>
@@ -242,9 +242,9 @@ export default function AdminDashboard() {
                     <td className="px-8 py-6 text-xs text-slate-500 font-medium">{order.service}</td>
                     <td className="px-8 py-6">
                        <div className="flex flex-col gap-1.5">
-                          <span className={`w-fit px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-[0.1em] ${
+                          <span className={`w-fit px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
                             order.status === 'Delivered' ? 'bg-green-500/10 text-green-400' :
-                            order.status === 'Completed' ? 'bg-[#8ff5ff]/10 text-[#8ff5ff]' :
+                            order.status === 'Completed' ? 'bg-primary/10 text-primary' :
                             'bg-yellow-500/10 text-yellow-400'
                           }`}>
                             {order.status}
