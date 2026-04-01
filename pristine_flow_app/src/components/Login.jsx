@@ -120,7 +120,7 @@ export default function Login() {
                 className="mt-6 w-full bg-white hover:bg-slate-100 text-black font-semibold py-4 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                Continue with Google Node
+                Continue with Google
               </button>
             </div>
 
