@@ -20,10 +20,15 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000", "https://pristine-flow.vercel.app/"],
+    origin: ["http://localhost:5173", "http://localhost:3000", "https://pristine-flow.vercel.app"],
     credentials: true
 }));
 app.use(express.json());
+
+// Health Check
+app.get("/", (req, res) => {
+    res.json({ status: "Pristine Flow API Node Live", timestamp: new Date().toISOString() });
+});
 
 // Better Auth Middleware
 app.all("/api/auth/*path", toNodeHandler(auth));
