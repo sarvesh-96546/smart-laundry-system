@@ -8,7 +8,14 @@ const verifyToken = async (req, res, next) => {
         if (session) {
             req.userId = session.user.id;
             req.userName = session.user.name;
-            req.userRole = session.user.role || 'customer';
+            
+            const { data: userData } = await supabase
+                .from('user')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+            
+            req.userRole = userData?.role || session.user.role || 'customer';
             return next();
         }
 

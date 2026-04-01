@@ -170,14 +170,21 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (sessionData?.user) {
-      const formattedUser = {
-        id: sessionData.user.id,
-        email: sessionData.user.email,
-        name: sessionData.user.name,
-        role: sessionData.user.role || 'customer',
-        image: sessionData.user.image
-      };
-      setUser(formattedUser);
+        supabase.from('user').select('role, phone_number').eq('id', sessionData.user.id).single().then(({ data: userData, error }) => {
+            if (error) {
+                console.error('[AppContext_RoleSync_Error]', error);
+            }
+            const formattedUser = {
+                id: sessionData.user.id,
+                email: sessionData.user.email,
+                name: sessionData.user.name,
+                role: userData?.role || 'customer',
+                phone_number: userData?.phone_number || null,
+                image: sessionData.user.image
+            };
+            console.log('[AppContext_User_Sync]', formattedUser);
+            setUser(formattedUser);
+        });
     } else if (!isSessionPending) {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) {
