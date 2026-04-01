@@ -2,15 +2,12 @@ const { betterAuth } = require("better-auth");
 const { Pool } = require("pg");
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.TRANSACTION_URL,
     ssl: { rejectUnauthorized: false }
 });
 
 const auth = betterAuth({
-    database: {
-        db: pool,
-        type: "postgres"
-    },
+    database: pool,
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL,
     trustedOrigins: [
