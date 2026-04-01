@@ -20,7 +20,7 @@ export const AppProvider = ({ children }) => {
     chart_data: []
   });
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const getAuthHeaders = () => ({
     'Content-Type': 'application/json',

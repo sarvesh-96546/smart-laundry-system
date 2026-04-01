@@ -17,8 +17,17 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"], // common vite/cra ports
+    credentials: true
+}));
 app.use(express.json());
+
+// Request Logger
+app.use((req, req_res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Attach io to app for use in controllers
 app.set('io', io);

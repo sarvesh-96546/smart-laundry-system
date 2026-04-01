@@ -43,7 +43,7 @@ export default function NewOrderPage() {
       });
       setCreatedOrder(result);
     } catch (err) {
-      alert('Sync Failure: Protocol rejected by core engine.');
+      alert(`Sync Failure: ${err.message || 'Protocol rejected by server'}`);
     } finally {
       setIsSubmitting(false);
     }

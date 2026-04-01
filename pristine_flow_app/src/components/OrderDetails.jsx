@@ -27,7 +27,7 @@ export default function OrderDetails() {
         setError(data.error || data.message || 'Order not found');
       }
     } catch (err) {
-      setError('Failed to fetch order details');
+      setError(`Failed to fetch: ${err.message || 'Connection error'}`);
     } finally {
       setLoading(false);
     }

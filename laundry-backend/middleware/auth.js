@@ -16,7 +16,8 @@ const verifyToken = async (req, res, next) => {
         const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error || !user) {
-            return res.status(401).json({ message: 'Unauthorized: Invalid Supabase Token' });
+            console.warn(`[AUTH_FAILURE] Token verification failed: ${error?.message || 'User not found'}`);
+            return res.status(401).json({ message: 'Unauthorized: Invalid Supabase Token', error: error?.message });
         }
 
         req.userId = user.id;
