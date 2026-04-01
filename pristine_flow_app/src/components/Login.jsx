@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { supabase } from '../lib/supabase';
+import { authClient } from '../lib/auth-client';
 
 export default function Login() {
   const [email, setEmail] = useState('admin@gmail.com');
@@ -12,12 +13,12 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const data = await authClient.signIn.social({
         provider: 'google',
+        callbackURL: '/'
       });
-      if (error) throw error;
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'Google authentication failed');
     }
   };
 

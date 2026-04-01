@@ -1,0 +1,25 @@
+const { betterAuth } = require("better-auth");
+const { Pool } = require("pg");
+
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
+
+const auth = betterAuth({
+    database: {
+        db: pool,
+        type: "postgres"
+    },
+    emailAndPassword: {
+        enabled: true
+    },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        },
+    },
+});
+
+module.exports = { auth };

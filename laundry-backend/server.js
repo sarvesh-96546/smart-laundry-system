@@ -3,7 +3,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
 const { Server } = require('socket.io');
+const { auth } = require('./auth');
 const userRoutes = require('./routes/userRoutes');
+const { toNodeHandler } = require('better-auth/node');
 
 dotenv.config();
 
@@ -18,10 +20,13 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"], // common vite/cra ports
+    origin: ["http://localhost:5173", "http://localhost:3000"],
     credentials: true
 }));
 app.use(express.json());
+
+// Better Auth Middleware
+app.all("/api/auth/*", toNodeHandler(auth));
 
 // Request Logger
 app.use((req, req_res, next) => {

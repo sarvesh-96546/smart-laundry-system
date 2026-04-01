@@ -1,28 +1,28 @@
 const supabase = require('../config/supabase');
+const { auth } = require('../auth');
 
 const verifyToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.status(403).json({ message: 'No token provided' });
-
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({ message: 'Invalid token format' });
-    }
-
     try {
-        // Since the frontend logs in via Supabase, it provides a Supabase access_token.
-        // We verify it with the Supabase Auth API
-        const { data: { user }, error } = await supabase.auth.getUser(token);
+        // 1. Try Better Auth Session first
+        const session = await auth.api.getSession({ headers: req.headers });
+        if (session) {
+            req.userId = session.user.id;
+            req.userName = session.user.name;
+            req.userRole = session.user.role || 'customer';
+            return next();
+        }
 
+        // 2. Fallback to Supabase Token (Legacy/Manual)
+        const token = authHeader.split(' ')[1];
+        if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+        const { data: { user }, error } = await supabase.auth.getUser(token);
         if (error || !user) {
-            console.warn(`[AUTH_FAILURE] Token verification failed: ${error?.message || 'User not found'}`);
-            return res.status(401).json({ message: 'Unauthorized: Invalid Supabase Token', error: error?.message });
+            return res.status(401).json({ message: 'Unauthorized: Invalid Session or Token' });
         }
 
         req.userId = user.id;
-        // In Supabase, custom roles can be stored in user_metadata or app_metadata
-        // Alternatively, since we created a separate public.users table, we should fetch the role from there.
         
         let { data: userData, error: fetchError } = await supabase
             .from('users')

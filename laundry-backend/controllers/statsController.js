@@ -11,8 +11,8 @@ const getStats = async (req, res) => {
 
         orders.forEach(o => {
             if (o.payment_status === 'Paid') totalRevenue += Number(o.amount);
-            if (o.status !== 'Delivered' && o.status !== 'Ready') inProgress++;
-            if (o.status === 'Ready') ready++;
+            if (o.status !== 'Delivered' && o.status !== 'Ready' && o.status !== 'Completed') inProgress++;
+            if (o.status === 'Ready' || o.status === 'Completed') ready++;
         });
 
         // Group by date for chart (handle timezone strings correctly)

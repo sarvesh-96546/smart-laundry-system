@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
+import { authClient, useSession } from '../lib/auth-client';
 
 const AppContext = createContext();
 
@@ -22,10 +23,14 @@ export const AppProvider = ({ children }) => {
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const getAuthHeaders = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-  });
+  const getAuthHeaders = () => {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    const token = localStorage.getItem('token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
+  };
 
 
   const fetchCustomers = async () => {
@@ -164,53 +169,59 @@ export const AppProvider = ({ children }) => {
     steamPress: 50
   });
 
+  // --- Better Auth Session Hook ---
+  const { data: sessionData, isPending: isSessionPending } = useSession();
+
   useEffect(() => {
-    // Check initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        // Fetch actual role from public.users table
-        const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
-        
-        // Map supabase user to our local user structure
-        const formattedUser = {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-          role: userData?.role || 'customer' 
-        };
-        setUser(formattedUser);
-        localStorage.setItem('token', session.access_token);
-      }
-    });
+    if (sessionData?.user) {
+      const formattedUser = {
+        id: sessionData.user.id,
+        email: sessionData.user.email,
+        name: sessionData.user.name,
+        role: sessionData.user.role || 'customer',
+        image: sessionData.user.image
+      };
+      setUser(formattedUser);
+    } else if (!isSessionPending) {
+        // Fallback to existing Supabase session if no Better Auth session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                supabase.from('users').select('role').eq('id', session.user.id).single().then(({ data: userData }) => {
+                  setUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+                    role: userData?.role || 'customer'
+                  });
+                  localStorage.setItem('token', session.access_token);
+                });
+            } else {
+                setUser(null);
+            }
+        });
+    }
+  }, [sessionData, isSessionPending]);
 
-    // Listen to Auth State changes
+  useEffect(() => {
+    // Listen to Auth State changes (Supabase Fallback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-         // Fetch actual role from public.users table
+      if (!sessionData?.user && session) {
          const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
-
-         const formattedUser = {
+         setUser({
           id: session.user.id,
           email: session.user.email,
           name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
           role: userData?.role || 'customer'
-        };
-        setUser(formattedUser);
+        });
         localStorage.setItem('token', session.access_token);
-        
-        // If login successful from OAuth, let's toast!
-        if (_event === 'SIGNED_IN') {
-           toast.success(`Welcome, ${formattedUser.name}! Access Level: ${formattedUser.role.toUpperCase()}`);
-        }
-
-      } else {
+      } else if (!sessionData?.user && !session) {
         setUser(null);
         localStorage.removeItem('token');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [sessionData]);
 
   const login = async (email, password) => {
     try {
@@ -237,7 +248,10 @@ export const AppProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // Sign out from both
+    await authClient.signOut();
     await supabase.auth.signOut();
+    
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
