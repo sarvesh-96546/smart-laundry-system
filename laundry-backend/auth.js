@@ -11,6 +11,8 @@ const auth = betterAuth({
         db: pool,
         type: "postgres"
     },
+    secret: process.env.BETTER_AUTH_SECRET,
+    baseURL: process.env.BETTER_AUTH_URL,
     emailAndPassword: {
         enabled: true
     },
