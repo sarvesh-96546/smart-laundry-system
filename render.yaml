@@ -8,10 +8,10 @@ services:
     startCommand: npm start
     envVars:
       - key: SUPABASE_URL
-        sync: false # You will need to paste your Supabase URL manually in the Render dashboard during setup
+        sync: false
       - key: SUPABASE_ANON_KEY
-        sync: false # You will need to paste your Supabase Anon Key manually in the Render dashboard
+        sync: false
       - key: RESEND_API_KEY
-        sync: false # You will need to paste your Resend API Key manually in the Render dashboard
+        sync: false
       - key: FRONTEND_URL
-        sync: false # Set this to your Vercel URL once deployed to allow CORS
+        sync: false
