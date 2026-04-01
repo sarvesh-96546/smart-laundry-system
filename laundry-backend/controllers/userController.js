@@ -10,7 +10,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const { data: users, error } = await supabase.from('users').select('id, name, email, role, phone_number, created_at');
+        const { data: users, error } = await supabase.from('user').select('id, name, email, role, phone_number, createdAt');
         if (error) throw error;
         res.json(users);
     } catch (error) {
@@ -21,8 +21,8 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     try {
         const { data: user, error } = await supabase
-            .from('users')
-            .select('id, name, email, role, phone_number, created_at')
+            .from('user')
+            .select('id, name, email, role, phone_number, createdAt')
             .eq('id', req.params.id)
             .single();
 
@@ -37,7 +37,7 @@ const updateUser = async (req, res) => {
     const { name, email, role, phone_number } = req.body;
     try {
         const { error } = await supabase
-            .from('users')
+            .from('user')
             .update({ name, email, role, phone_number })
             .eq('id', req.params.id);
 
@@ -50,7 +50,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const { error } = await supabase.from('users').delete().eq('id', req.params.id);
+        const { error } = await supabase.from('user').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
@@ -61,7 +61,7 @@ const deleteUser = async (req, res) => {
 const getCustomers = async (req, res) => {
     try {
         const { data: customers, error } = await supabase
-            .from('users')
+            .from('user')
             .select('id, name, email, phone_number')
             .eq('role', 'customer');
 

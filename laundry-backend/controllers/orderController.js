@@ -118,7 +118,7 @@ const updateOrderStatus = async (req, res) => {
 
         if (status === 'Completed' || status === 'Ready') {
             if (currentOrder.customer_id) {
-                const { data: userData } = await supabase.from('users').select('email').eq('id', currentOrder.customer_id).single();
+                const { data: userData } = await supabase.from('user').select('email').eq('id', currentOrder.customer_id).single();
                 if (userData?.email) {
                     const { sendOrderReadyEmail } = require('../utils/emailService');
                     sendOrderReadyEmail(userData.email, currentOrder.customer_name, orderId);

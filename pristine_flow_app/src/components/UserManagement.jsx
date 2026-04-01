@@ -129,7 +129,7 @@ export default function UserManagement() {
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-xs text-slate-400">{user.phone_number || 'N/A'}</td>
-                                    <td className="px-8 py-6 text-[10px] text-slate-500 uppercase">{new Date(user.created_at).toLocaleDateString()}</td>
+                                    <td className="px-8 py-6 text-[10px] text-slate-500 uppercase">{new Date(user.createdAt).toLocaleDateString()}</td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 

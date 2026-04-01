@@ -23,7 +23,7 @@ const verifyToken = async (req, res, next) => {
         req.userId = user.id;
         
         let { data: userData, error: fetchError } = await supabase
-            .from('users')
+            .from('user')
             .select('role, name')
             .eq('id', user.id)
             .single();
@@ -33,16 +33,18 @@ const verifyToken = async (req, res, next) => {
                 id: user.id,
                 email: user.email,
                 name: user.user_metadata?.full_name || user.email.split('@')[0],
-                role: 'customer'
+                role: 'customer',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
             };
             const { data: createdUser, error: insertError } = await supabase
-                .from('users')
+                .from('user')
                 .insert(newUserData)
                 .select('role, name')
                 .single();
             
             if (insertError) {
-                console.error('[AUTH_SYNC_ERROR] Failed to create public.users record:', insertError);
+                console.error('[AUTH_SYNC_ERROR] Failed to create public.user record:', insertError);
             }
             userData = createdUser || newUserData;
         }

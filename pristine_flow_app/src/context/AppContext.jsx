@@ -181,7 +181,7 @@ export const AppProvider = ({ children }) => {
     } else if (!isSessionPending) {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) {
-                supabase.from('users').select('role').eq('id', session.user.id).single().then(({ data: userData }) => {
+                supabase.from('user').select('role').eq('id', session.user.id).single().then(({ data: userData }) => {
                   setUser({
                     id: session.user.id,
                     email: session.user.email,
@@ -200,7 +200,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!sessionData?.user && session) {
-         const { data: userData } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+         const { data: userData } = await supabase.from('user').select('role').eq('id', session.user.id).single();
          setUser({
           id: session.user.id,
           email: session.user.email,
