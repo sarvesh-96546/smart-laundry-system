@@ -7,12 +7,9 @@ const createOrder = async (req, res) => {
     const orderId = `LD-${Math.floor(10000 + Math.random() * 90000)}`;
     const customer_id = req.userId || req.body.customer_id;
 
-    console.log(`[ORDER_REQUEST] Creating order ${orderId} for Customer ID: ${customer_id}`);
-
     try {
         if (!service_type) return res.status(400).json({ success: false, error: 'Missing service_type' });
-        if (!customer_id && !customer_name) return res.status(400).json({ success: false, error: 'Missing customer identity' });
-
+        
         const orderData = {
             id: orderId,
             customer_id: customer_id || null,
@@ -36,16 +33,18 @@ const createOrder = async (req, res) => {
         if (updateError) throw updateError;
 
         const io = req.app.get('io');
-        io.emit('new_order', { 
-            order_id: orderId, 
-            customer_name: orderData.customer_name, 
-            priority: orderData.priority_level 
-        });
+        if (io) {
+            io.emit('new_order', { 
+                order_id: orderId, 
+                customer_name: orderData.customer_name, 
+                priority: orderData.priority_level 
+            });
+        }
 
         res.status(201).json({ success: true, order: orderData });
     } catch (error) {
         console.error(`[ORDER_CREATE_ERROR] Order ID: ${orderId}, Error:`, error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
     }
 };
 

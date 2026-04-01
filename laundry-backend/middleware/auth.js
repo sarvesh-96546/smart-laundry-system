@@ -19,8 +19,9 @@ const verifyToken = async (req, res, next) => {
             return next();
         }
 
+        if (!authHeader) return res.status(401).json({ message: 'Unauthorized: Missing Authorization Header' });
         const token = authHeader.split(' ')[1];
-        if (!token) return res.status(401).json({ message: 'Unauthorized' });
+        if (!token) return res.status(401).json({ message: 'Unauthorized: Invalid Token Format' });
 
         const { data: { user }, error } = await supabase.auth.getUser(token);
         if (error || !user) {
@@ -39,7 +40,7 @@ const verifyToken = async (req, res, next) => {
             const newUserData = {
                 id: user.id,
                 email: user.email,
-                name: user.user_metadata?.full_name || user.email.split('@')[0],
+                name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'New User',
                 role: 'customer',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
@@ -57,7 +58,7 @@ const verifyToken = async (req, res, next) => {
         }
 
         req.userRole = userData?.role || 'customer';
-        req.userName = userData?.name || user.email.split('@')[0];
+        req.userName = userData?.name || user.email?.split('@')[0] || 'Unknown User';
         
         next();
     } catch (err) {

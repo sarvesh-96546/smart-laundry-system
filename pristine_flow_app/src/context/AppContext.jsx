@@ -170,10 +170,7 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (sessionData?.user) {
-        supabase.from('user').select('role, phone_number').eq('id', sessionData.user.id).single().then(({ data: userData, error }) => {
-            if (error) {
-                console.error('[AppContext_RoleSync_Error]', error);
-            }
+        supabase.from('user').select('role, phone_number').eq('id', sessionData.user.id).single().then(({ data: userData }) => {
             const formattedUser = {
                 id: sessionData.user.id,
                 email: sessionData.user.email,
@@ -182,7 +179,6 @@ export const AppProvider = ({ children }) => {
                 phone_number: userData?.phone_number || null,
                 image: sessionData.user.image
             };
-            console.log('[AppContext_User_Sync]', formattedUser);
             setUser(formattedUser);
         });
     } else if (!isSessionPending) {
@@ -192,7 +188,7 @@ export const AppProvider = ({ children }) => {
                   setUser({
                     id: session.user.id,
                     email: session.user.email,
-                    name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+                    name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Unknown User',
                     role: userData?.role || 'customer'
                   });
                   localStorage.setItem('token', session.access_token);
@@ -211,7 +207,7 @@ export const AppProvider = ({ children }) => {
          setUser({
           id: session.user.id,
           email: session.user.email,
-          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Unknown User',
           role: userData?.role || 'customer'
         });
         localStorage.setItem('token', session.access_token);
@@ -263,19 +259,21 @@ export const AppProvider = ({ children }) => {
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify(orderData),
       });
       const data = await response.json();
+
       if (response.ok && data.success) {
         fetchOrders();
         fetchStats();
         toast.success('Order created successfully!');
         return data.order;
       }
-      throw new Error(data.error || 'Failed to create order');
+      throw new Error(data.error || data.message || 'Failed to create order');
     } catch (err) {
       toast.error(err.message || 'Create order error');
-      console.error('Create order error:', err);
+      console.error('Order Error:', err);
       throw err;
     }
   };
