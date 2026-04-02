@@ -17,12 +17,10 @@ const auth = betterAuth({
         "https://pristine-flow.vercel.app",
         "https://pristinr-flow-api.onrender.com"
     ],
-    account: {
-        skipStateCookieCheck: true
-    },
+
     advanced: {
         cookie: {
-            sameSite: "none",
+            sameSite: "lax",
             secure: process.env.NODE_ENV === "production"
         }
     },

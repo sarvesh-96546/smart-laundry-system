@@ -41,7 +41,7 @@ const getStats = async (req, res) => {
             chart_data
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal System Error fetching statistics' });
     }
 };
 

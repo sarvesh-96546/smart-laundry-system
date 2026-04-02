@@ -31,7 +31,7 @@ const createOrder = async (req, res) => {
 
         res.status(201).json({ success: true, order: { id: orderId, customer_name, status: 'Pending' } });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
+        res.status(500).json({ success: false, error: 'Internal System Error during order creation' });
     }
 };
 
@@ -52,7 +52,7 @@ const getOrders = async (req, res) => {
         const result = await pool.query(sql, params);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal System Error fetching order list' });
     }
 };
 

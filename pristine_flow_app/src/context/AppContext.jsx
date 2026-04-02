@@ -234,9 +234,14 @@ export const AppProvider = ({ children }) => {
         toast.success('Order created successfully!');
         return data.order;
       }
-      throw new Error(data.error || data.message || 'Failed to create order');
+      
+      const errorMessage = data.error || data.message || 'Mission Critical: Order Creation Failed';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     } catch (err) {
-      toast.error(err.message || 'Create order error');
+      if (!err.message.includes('Mission')) {
+        toast.error('System Connectivity Error: Please check your network');
+      }
       throw err;
     }
   };

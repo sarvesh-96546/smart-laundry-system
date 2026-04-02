@@ -24,8 +24,13 @@ const startMachine = async (req, res) => {
     const endTime = new Date(Date.now() + durationMs).toISOString();
 
     try {
-        const machineResult = await pool.query('SELECT usage_count, type FROM machinery WHERE id = $1', [machine_id]);
+        const machineResult = await pool.query('SELECT usage_count, type, status FROM machinery WHERE id = $1', [machine_id]);
+        if (machineResult.rows.length === 0) return res.status(404).json({ error: 'Machine not found' });
         const currentMachine = machineResult.rows[0];
+
+        if (currentMachine.status === 'Running') {
+            return res.status(400).json({ error: 'Protocol Violation: Machine is already active' });
+        }
 
         await pool.query(
             'UPDATE machinery SET assigned_order_id = $1, cycle_start_time = $2, expected_end_time = $3, status = $4, usage_count = $5 WHERE id = $6',

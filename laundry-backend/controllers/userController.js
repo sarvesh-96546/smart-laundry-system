@@ -1,13 +1,5 @@
 const { pool } = require('../auth');
 
-const register = async (req, res) => {
-    res.status(400).json({ message: 'Authentication is handled by Better Auth. Please use the frontend client.' });
-};
-
-const login = async (req, res) => {
-    res.status(400).json({ message: 'Authentication is handled by Better Auth. Please use the frontend client.' });
-};
-
 const getUsers = async (req, res) => {
     try {
         const result = await pool.query('SELECT id, name, email, role, phone_number, "createdAt" FROM "user"');
@@ -30,13 +22,17 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { name, email, role, phone_number } = req.body;
     try {
+        if (role && req.userRole !== 'admin') {
+            return res.status(403).json({ message: 'Unauthorized: Only admins can modify user roles' });
+        }
+
         await pool.query(
-            'UPDATE "user" SET name = $1, email = $2, role = $3, phone_number = $4, "updatedAt" = NOW() WHERE id = $5',
-            [name, email, role, phone_number, req.params.id]
+            'UPDATE "user" SET name = $1, email = $2, role = COALESCE($3, role), phone_number = $4, "updatedAt" = NOW() WHERE id = $5',
+            [name, email, role || null, phone_number, req.params.id]
         );
         res.json({ message: 'User updated successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating user', error: error.message });
+        res.status(500).json({ message: 'Error updating user' });
     }
 };
 
@@ -58,4 +54,4 @@ const getCustomers = async (req, res) => {
     }
 };
 
-module.exports = { register, login, getUsers, getUserById, updateUser, deleteUser, getCustomers, pool };
+module.exports = { getUsers, getUserById, updateUser, deleteUser, getCustomers, pool };
