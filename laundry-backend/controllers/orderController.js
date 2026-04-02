@@ -65,8 +65,16 @@ const getOrderById = async (req, res) => {
 
         const updatesResult = await pool.query('SELECT * FROM order_updates WHERE order_id = $1 ORDER BY timestamp DESC', [id]);
         
-        if (req.userRole === 'customer' && order.customer_id !== req.userId) {
-            return res.status(403).json({ error: 'Unauthorized to view this order' });
+        if (req.userRole === 'customer' && order.customer_id && order.customer_id !== req.userId) {
+            return res.status(403).json({ error: 'Protocol Violation: Access Restricted to Owner' });
+        }
+
+        const isOwner = req.userId && order.customer_id === req.userId;
+        const isPrivileged = req.userRole === 'staff' || req.userRole === 'admin';
+
+        if (!isOwner && !isPrivileged) {
+            delete order.address;
+            delete order.phone;
         }
 
         res.json({ order, updates: updatesResult.rows });

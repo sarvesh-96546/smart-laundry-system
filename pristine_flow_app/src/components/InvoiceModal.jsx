@@ -73,8 +73,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
             </div>
 
             <table className="w-full mb-12">
-                <thead>
-                    <tr className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b-2 border-slate-50">
+                <thead><tr>
                         <th className="py-4 text-left">Service Node</th>
                         <th className="py-4 text-center">Qty</th>
                         <th className="py-4 text-right">Price</th>

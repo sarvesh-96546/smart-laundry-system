@@ -19,7 +19,13 @@ const io = new Server(server, {
 });
 
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000", "https://pristine-flow.vercel.app"],
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:5002",
+        "http://localhost:3000",
+        "https://pristine-flow.vercel.app",
+        "https://pristinr-flow-api.onrender.com"
+    ],
     credentials: true
 }));
 app.use(express.json());

@@ -100,8 +100,7 @@ export default function UserManagement() {
 
                 <div className="bg-[#121212] rounded-4xl border border-white/5 overflow-hidden shadow-2xl">
                     <table className="w-full text-left">
-                        <thead>
-                            <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5 bg-white/2">
+                        <thead><tr>
                                 <th className="px-8 py-6">Identity</th>
                                 <th className="px-8 py-6">Role</th>
                                 <th className="px-8 py-6">Contact</th>

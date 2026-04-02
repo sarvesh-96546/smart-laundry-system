@@ -44,10 +44,10 @@ export default function Footer() {
         <div>
           <h4 className="text-primary font-bold uppercase tracking-[0.2em] text-[10px] mb-8">Fabric Solutions</h4>
           <ul className="space-y-4 text-sm text-slate-400">
-            <li><a href="#services" className="hover:text-white transition-colors">Molecular Wash</a></li>
-            <li><a href="#services" className="hover:text-white transition-colors">Bio-Dry Cleaning</a></li>
-            <li><a href="#services" className="hover:text-white transition-colors">Garment Restoration</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Support Intelligence</a></li>
+            <li><Link to="/solutions" className="hover:text-white transition-colors">Molecular Wash</Link></li>
+            <li><Link to="/solutions" className="hover:text-white transition-colors">Bio-Dry Cleaning</Link></li>
+            <li><Link to="/solutions" className="hover:text-white transition-colors">Garment Restoration</Link></li>
+            <li><Link to="/support" className="hover:text-white transition-colors">Support Intelligence</Link></li>
           </ul>
         </div>
 
@@ -64,7 +64,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary text-xl">call</span>
-              <p className="text-sm text-slate-400">+1 (555) 000-FLOW</p>
+              <p className="text-sm text-slate-400">+91 9876543210</p>
             </div>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary text-xl">mail</span>
@@ -80,9 +80,9 @@ export default function Footer() {
           © 2026 PRISTINE FLOW OPERATIONAL ALCHEMY. ALL PROTOCOLS RESERVED.
         </p>
         <div className="flex gap-8 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
-          <a href="#" className="hover:text-primary transition-colors">Privacy Cipher</a>
-          <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-          <a href="#" className="hover:text-primary transition-colors">Data Protocol</a>
+          <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+          <Link to="/data-protocol" className="hover:text-primary transition-colors">Data Protocol</Link>
         </div>
       </div>
     </footer>

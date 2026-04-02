@@ -77,7 +77,7 @@ export default function AdminDashboard() {
               />
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-800 overflow-hidden border border-white/10 shrink-0">
-                  <img src={user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=0D8ABC&color=fff"} alt="User" />
+                  <img src={user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=0D8ABC&color=fff"} alt="User" referrerPolicy="no-referrer" />
             </div>
             <Link 
               to="/admin/new-order"
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <LineChart data={stats?.chart_data || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
                   <XAxis dataKey="date" stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
           <div className="bg-[#121212] p-6 rounded-2xl border border-white/5">
             <h2 className="font-bold mb-6">Distribution</h2>
             <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <PieChart>
                   <Pie
                     data={[
@@ -212,7 +212,8 @@ export default function AdminDashboard() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead>                <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">
+              <thead>
+                <tr className="text-[10px] text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">
                   <th className="px-8 py-6 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('id')}>ID</th>
                   <th className="px-8 py-6 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('customer')}>Customer</th>
                   <th className="px-8 py-6">Priority</th>

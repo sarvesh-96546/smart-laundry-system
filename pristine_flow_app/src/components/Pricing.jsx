@@ -3,7 +3,7 @@ import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
 
 export default function Pricing() {
-  const { prices, setPrices } = useApp();
+  const { prices, setPrices, user } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [newBase, setNewBase] = useState(prices.base);
 
@@ -20,10 +20,15 @@ export default function Pricing() {
             Pristine Flow
           </div>
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-tight">
-            <Link className="text-neutral-400 hover:text-cyan-300 transition-all" to="/admin">Dashboard</Link>
-            <Link className="text-cyan-400 font-bold hover:text-cyan-300 transition-all" to="/pricing">Pricing</Link>
-            <Link className="text-neutral-400 hover:text-cyan-300 transition-all" to="/customers">Customers</Link>
-            <Link className="text-neutral-400 hover:text-cyan-300 transition-all" to="/machinery">Machinery</Link>
+            <Link className="text-neutral-400 hover:text-cyan-300 transition-all font-bold uppercase tracking-widest text-[10px]" to="/">Home</Link>
+            {user && (user.role === 'admin' || user.role === 'staff') && (
+                <>
+                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/admin">Dashboard</Link>
+                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/customers">Customers</Link>
+                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/machinery">Machinery</Link>
+                </>
+            )}
+            <Link className="text-cyan-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/pricing">Pricing</Link>
           </div>
         </div>
       </nav>
@@ -40,7 +45,7 @@ export default function Pricing() {
           </div>
           <div className="bg-[#121212] p-4 rounded-2xl border border-white/5 flex flex-col items-end gap-2">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Global Base Rate</span>
-            {isEditing ? (
+            {isEditing && (user?.role === 'admin' || user?.role === 'staff') ? (
               <div className="flex gap-2">
                 <input 
                   type="number" 
@@ -51,9 +56,12 @@ export default function Pricing() {
                 <button onClick={handleUpdate} className="text-xs bg-cyan-500 text-black px-2 py-1 rounded font-bold">SAVE</button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setIsEditing(true)}>
+              <div className={`flex items-center gap-2 group ${(user?.role === 'admin' || user?.role === 'staff') ? 'cursor-pointer' : ''}`} 
+                   onClick={() => (user?.role === 'admin' || user?.role === 'staff') && setIsEditing(true)}>
                 <span className="text-2xl font-bold text-primary">₹{prices.base}</span>
-                <span className="material-symbols-outlined text-xs text-slate-500 group-hover:text-cyan-400">edit</span>
+                {(user?.role === 'admin' || user?.role === 'staff') && (
+                  <span className="material-symbols-outlined text-xs text-slate-500 group-hover:text-cyan-400 transition-colors">edit</span>
+                )}
               </div>
             )}
           </div>

@@ -15,6 +15,12 @@ import OrderDetails from './components/OrderDetails';
 import NewOrderPage from './components/NewOrderPage';
 import StaffPanel from './components/StaffPanel';
 import UserManagement from './components/UserManagement';
+import PrivacyCipher from './components/PrivacyCipher';
+import TermsOfService from './components/TermsOfService';
+import DataProtocol from './components/DataProtocol';
+import SupportIntelligence from './components/SupportIntelligence';
+import FabricSolutions from './components/FabricSolutions';
+import ErrorProtocol from './components/ErrorProtocol';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useApp();
@@ -83,14 +89,20 @@ function App() {
           <Routes>
             <Route path="/" element={<CustomerHome />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
-            <Route path="/admin/new-order" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><NewOrderPage /></ProtectedRoute>} />
+            <Route path="/admin/new-order" element={<ProtectedRoute allowedRoles={['admin', 'staff', 'customer']}><NewOrderPage /></ProtectedRoute>} />
             <Route path="/staff" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><StaffPanel /></ProtectedRoute>} />
-            <Route path="/machinery" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><Machinery /></ProtectedRoute>} />
+            <Route path="/machinery" element={<ProtectedRoute allowedRoles={['admin', 'staff', 'customer']}><Machinery /></ProtectedRoute>} />
             <Route path="/customers" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><CustomerNetwork /></ProtectedRoute>} />
-            <Route path="/pricing" element={<ProtectedRoute allowedRoles={['admin', 'staff']}><Pricing /></ProtectedRoute>} />
             <Route path="/order/:id" element={<OrderDetails />} />
+            <Route path="/privacy" element={<PrivacyCipher />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/data-protocol" element={<DataProtocol />} />
+            <Route path="/support" element={<SupportIntelligence />} />
+            <Route path="/solutions" element={<FabricSolutions />} />
+            <Route path="*" element={<ErrorProtocol />} />
           </Routes>
           <Footer />
         </NavigationWrapper>

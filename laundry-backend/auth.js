@@ -12,9 +12,17 @@ const auth = betterAuth({
     baseURL: process.env.BETTER_AUTH_URL,
     trustedOrigins: [
         "http://localhost:5173",
+        "http://localhost:5002",
         "http://localhost:3000",
-        "https://pristine-flow.vercel.app"
+        "https://pristine-flow.vercel.app",
+        "https://pristinr-flow-api.onrender.com"
     ],
+    advanced: {
+        cookie: {
+            sameSite: "none",
+            secure: true
+        }
+    },
     emailAndPassword: {
         enabled: true
     },

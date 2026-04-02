@@ -87,8 +87,7 @@ export default function CustomerNetwork() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[0.65rem] uppercase tracking-[0.15em] text-slate-500 font-bold border-b border-white/5">
+              <thead><tr>
                   <th className="px-8 py-6">Customer Identity</th>
                   <th className="px-8 py-6">Status</th>
                   <th className="px-8 py-6">Orders</th>

@@ -14,7 +14,8 @@ const getRemainingTime = (endTime) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-function MachineCard({ machine, onStop }) {
+function MachineCard({ machine, onStop, user }) {
+  const isStaff = user?.role === 'staff' || user?.role === 'admin';
   const [timeLeft, setTimeLeft] = useState(getRemainingTime(machine.expected_end_time));
 
   useEffect(() => {
@@ -79,14 +80,16 @@ function MachineCard({ machine, onStop }) {
             <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
                <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Active Protocol</p>
                <p className="font-bold text-sm text-primary">{machine.assigned_order_id}</p>
-               <p className="text-[10px] text-slate-400 mt-1">{machine.assigned_customer}</p>
+               {isStaff && <p className="text-[10px] text-slate-400 mt-1">{machine.assigned_customer}</p>}
             </div>
-            <button 
-              onClick={() => onStop(machine.id)}
-              className="w-full py-4 bg-white/5 hover:bg-[#ff8f8f]/10 border border-white/5 hover:border-[#ff8f8f]/20 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#ff8f8f] transition-all"
-            >
-              Manual Override
-            </button>
+            {isStaff && (
+              <button 
+                onClick={() => onStop(machine.id)}
+                className="w-full py-4 bg-white/5 hover:bg-[#ff8f8f]/10 border border-white/5 hover:border-[#ff8f8f]/20 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#ff8f8f] transition-all"
+              >
+                Manual Override
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -100,12 +103,14 @@ function MachineCard({ machine, onStop }) {
                   style={{ width: `${Math.min((machine.usage_count || 0) * 5, 100)}%` }}
                 ></div>
              </div>
-             <button 
-               disabled={isMaintenance}
-               className="w-full py-4 bg-white text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-all disabled:opacity-30"
-             >
-               Ready for Load
-             </button>
+             {isStaff && (
+               <button 
+                 disabled={isMaintenance}
+                 className="w-full py-4 bg-white text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-all disabled:opacity-30"
+               >
+                 Ready for Load
+               </button>
+             )}
           </div>
         )}
       </div>
@@ -114,7 +119,8 @@ function MachineCard({ machine, onStop }) {
 }
 
 export default function Machinery() {
-  const { machines, orders, startMachineCycle, stopMachineCycle, API_BASE_URL } = useApp();
+  const { machines, orders, startMachineCycle, stopMachineCycle, user } = useApp();
+  const isStaff = user?.role === 'staff' || user?.role === 'admin';
   const [selectedTask, setSelectedTask] = useState(null);
   const [isScanOpen, setIsScanOpen] = useState(false);
 
@@ -137,68 +143,72 @@ export default function Machinery() {
         <header className="fixed top-0 right-0 left-0 z-100 bg-background/80 backdrop-blur-3xl border-b border-white/5">
           <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-6">
             <div className="flex items-center gap-4">
-              <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+              <Link to={isStaff ? "/admin" : "/"} className="p-2 hover:bg-white/5 rounded-full transition-colors">
                 <span className="material-symbols-outlined text-slate-500">arrow_back</span>
               </Link>
               <div>
-                <h2 className="text-xl font-bold tracking-tighter">STAFF COMMAND</h2>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Operational Pulse: Active</p>
+                <h2 className="text-xl font-bold tracking-tighter">{isStaff ? "STAFF COMMAND" : "FACILITY STATUS"}</h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Operational Pulse: {isStaff ? "Active" : "Stable"}</p>
               </div>
             </div>
-            <button 
-              onClick={() => setIsScanOpen(true)}
-              className="px-6 py-3 bg-primary text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all flex items-center gap-3"
-            >
-              <span className="material-symbols-outlined text-lg">qr_code_scanner</span>
-              Scan Protocol
-            </button>
+            {isStaff && (
+              <button 
+                onClick={() => setIsScanOpen(true)}
+                className="px-6 py-3 bg-primary text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(143,245,255,0.3)] transition-all flex items-center gap-3"
+              >
+                <span className="material-symbols-outlined text-lg">qr_code_scanner</span>
+                Scan Protocol
+              </button>
+            )}
           </div>
         </header>
 
         <div className="max-w-7xl mx-auto pt-32 px-8 grid grid-cols-1 xl:grid-cols-12 gap-12">
-          {/* Left: Task Queue */}
-          <section className="xl:col-span-4 lg:sticky lg:top-32 h-fit">
-            <div className="flex items-center justify-between mb-8">
-               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Operational Queue</h3>
-               <span className="text-[10px] font-bold bg-primary/10 text-primary px-3 py-1 rounded-full uppercase">
-                 {pendingTasks.length} NODES
-               </span>
-            </div>
-            
-            <div className="space-y-4">
-              {pendingTasks.map(task => (
-                <div 
-                  key={task.id}
-                  onClick={() => setSelectedTask(task)}
-                  className={`relative group p-6 rounded-3xl border transition-all cursor-pointer ${
-                    selectedTask?.id === task.id ? 'bg-[#1a1a1a] border-primary/50' : 'bg-[#111] border-white/5 hover:border-white/10'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${
-                        task.priority === 'VIP' ? 'bg-yellow-500/10 text-yellow-500' :
-                        task.priority === 'Express' ? 'bg-[#ff8f8f]/10 text-[#ff8f8f]' : 'bg-white/5 text-slate-500'
-                     }`}>
-                       {task.priority || 'Standard'}
-                     </span>
-                     <span className="text-[10px] font-mono text-slate-600">{task.id}</span>
-                  </div>
-                  <h4 className="font-bold text-lg mb-1">{task.customer}</h4>
-                  <div className="flex justify-between items-center">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{task.status}</p>
-                    <div className="flex gap-1">
-                       {[1,2,3,4,5].map(i => (
-                         <div key={i} className={`w-1 h-3 rounded-full ${i <= (STAGES.indexOf(task.status) + 1) ? 'bg-primary' : 'bg-white/5'}`}></div>
-                       ))}
+          {/* Left: Task Queue (Staff Only) */}
+          {isStaff && (
+            <section className="xl:col-span-4 lg:sticky lg:top-32 h-fit">
+              <div className="flex items-center justify-between mb-8">
+                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Operational Queue</h3>
+                 <span className="text-[10px] font-bold bg-primary/10 text-primary px-3 py-1 rounded-full uppercase">
+                   {pendingTasks.length} NODES
+                 </span>
+              </div>
+              
+              <div className="space-y-4">
+                {pendingTasks.map(task => (
+                  <div 
+                    key={task.id}
+                    onClick={() => setSelectedTask(task)}
+                    className={`relative group p-6 rounded-3xl border transition-all cursor-pointer ${
+                      selectedTask?.id === task.id ? 'bg-[#1a1a1a] border-primary/50' : 'bg-[#111] border-white/5 hover:border-white/10'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                       <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${
+                          task.priority === 'VIP' ? 'bg-yellow-500/10 text-yellow-500' :
+                          task.priority === 'Express' ? 'bg-[#ff8f8f]/10 text-[#ff8f8f]' : 'bg-white/5 text-slate-500'
+                       }`}>
+                         {task.priority || 'Standard'}
+                       </span>
+                       <span className="text-[10px] font-mono text-slate-600">{task.id}</span>
+                    </div>
+                    <h4 className="font-bold text-lg mb-1">{task.customer}</h4>
+                    <div className="flex justify-between items-center">
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{task.status}</p>
+                      <div className="flex gap-1">
+                         {[1,2,3,4,5].map(i => (
+                           <div key={i} className={`w-1 h-3 rounded-full ${i <= (STAGES.indexOf(task.status) + 1) ? 'bg-primary' : 'bg-white/5'}`}></div>
+                         ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Right: Machine Grid */}
-          <section className="xl:col-span-8">
+          <section className={isStaff ? "xl:col-span-8" : "xl:col-span-12"}>
              <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Machinery Network</h3>
                 <div className="flex gap-4">
@@ -216,8 +226,9 @@ export default function Machinery() {
                      machine={machine} 
                      onStart={(id) => handleStart(id, selectedTask?.id)}
                      onStop={stopMachineCycle}
+                     user={user}
                    />
-                   {!machine.assigned_order_id && selectedTask && (
+                   {!machine.assigned_order_id && selectedTask && isStaff && (
                      <div className="absolute inset-0 bg-primary text-black rounded-4xl flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-20 cursor-pointer pointer-events-auto"
                           onClick={() => handleStart(machine.id, selectedTask.id)}>
                         <span className="material-symbols-outlined text-4xl mb-2">move_to_inbox</span>

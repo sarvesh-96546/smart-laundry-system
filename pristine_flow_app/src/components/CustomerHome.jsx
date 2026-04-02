@@ -282,69 +282,6 @@ export default function CustomerHome() {
           </div>
         </section>
 
-        {/* Mini Analytics Section */}
-        <section className="py-20 px-6 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5">
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">bar_chart</span>
-                Order Volume Trends
-              </h3>
-              <div className="h-[250px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={stats.chart_data?.length > 0 ? stats.chart_data : [
-                    { name: 'Mon', orders: 45 },
-                    { name: 'Tue', orders: 52 },
-                    { name: 'Wed', orders: 48 },
-                    { name: 'Thu', orders: 70 },
-                    { name: 'Fri', orders: 61 },
-                    { name: 'Sat', orders: 85 },
-                    { name: 'Sun', orders: 92 },
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
-                    <XAxis dataKey="name" stroke="#555" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#555" fontSize={10} tickLine={false} axisLine={false} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '12px' }}
-                      itemStyle={{ color: '#8ff5ff' }}
-                    />
-                    <Line type="monotone" dataKey="orders" stroke="#8ff5ff" strokeWidth={3} dot={{ fill: '#8ff5ff', r: 4 }} activeDot={{ r: 6, stroke: '#080808', strokeWidth: 2 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-[#121212] p-8 rounded-[2.5rem] border border-white/5">
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-tertiary">query_stats</span>
-                Peak Usage Hours
-              </h3>
-              <div className="h-[250px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={[
-                    { time: '8AM', load: 30 },
-                    { time: '10AM', load: 65 },
-                    { time: '12PM', load: 85 },
-                    { time: '2PM', load: 45 },
-                    { time: '4PM', load: 70 },
-                    { time: '6PM', load: 95 },
-                    { time: '8PM', load: 50 },
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
-                    <XAxis dataKey="time" stroke="#555" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#555" fontSize={10} tickLine={false} axisLine={false} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '12px' }}
-                      itemStyle={{ color: '#3b82f6' }}
-                    />
-                    <Bar dataKey="load" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Customer Tracking Input */}
         <section className="py-20 px-6 max-w-7xl mx-auto" id="tracking-input">
           <div className="relative group">
@@ -382,14 +319,14 @@ export default function CustomerHome() {
               </div>
               
               <div className="mt-8 flex gap-8">
-                <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest cursor-pointer hover:text-primary transition-colors" onClick={() => toast('QR Scanner initialized... (Demo Only)', { icon: '📸' })}>
                   <span className="material-symbols-outlined text-sm">qr_code_scanner</span>
                   Scan Receipt
                 </div>
-                <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+                <Link to="/support" className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-primary transition-colors">
                   <span className="material-symbols-outlined text-sm">support_agent</span>
                   Help Center
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -417,25 +354,6 @@ export default function CustomerHome() {
           </div>
         </section>
 
-        {/* Footer Polish */}
-        <footer className="py-20 px-6 border-t border-white/5">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-black text-sm">water_drop</span>
-              </div>
-              <span className="font-black tracking-tighter">PRISTINE FLOW</span>
-            </div>
-            <div className="flex gap-8 text-xs font-black text-slate-500 uppercase tracking-widest">
-              <span className="hover:text-white cursor-pointer transition-colors">Privacy Protocol</span>
-              <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-              <span className="hover:text-white cursor-pointer transition-colors">API Docs</span>
-            </div>
-            <div className="text-slate-500 text-xs font-bold">
-              © 2026 PRISTINE FLOW OPERATING SYSTEM. ALL RIGHTS RESERVED.
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

@@ -210,7 +210,7 @@ export default function OrderDetails() {
             </div>
 
             {/* Staff Controls */}
-            {user && (
+            {user && (user.role === 'staff' || user.role === 'admin') && (
               <div className="bg-[#111] border border-white/5 p-8 rounded-4xl">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-sm font-bold flex items-center gap-2">
