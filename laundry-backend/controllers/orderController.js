@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { pool } = require('../auth');
 
 const statusSequence = ['Pending', 'Washing', 'Drying', 'Ironing', 'Completed', 'Delivered'];
 
@@ -10,38 +10,26 @@ const createOrder = async (req, res) => {
     try {
         if (!service_type) return res.status(400).json({ success: false, error: 'Missing service_type' });
         
-        const orderData = {
-            id: orderId,
-            customer_id: customer_id || null,
-            customer_name: customer_name || 'Walk-in',
-            phone: phone || '0000000000',
-            address: address || null,
-            notes: notes || null,
-            items_count: items_count || 1,
-            amount: amount || 0,
-            priority_level: priority_level || 'Standard',
-            service_type: service_type,
-            status: 'Pending'
-        };
+        await pool.query(
+            'INSERT INTO orders (id, customer_id, customer_name, phone, address, notes, items_count, amount, priority_level, service_type, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+            [orderId, customer_id || null, customer_name || 'Walk-in', phone || '0000000000', address || null, notes || null, items_count || 1, amount || 0, priority_level || 'Standard', service_type, 'Pending']
+        );
 
-        const { error: insertError } = await supabase.from('orders').insert(orderData);
-        if (insertError) throw insertError;
-
-        const { error: updateError } = await supabase.from('order_updates').insert({
-            order_id: orderId, status: 'Pending'
-        });
-        if (updateError) throw updateError;
+        await pool.query(
+            'INSERT INTO order_updates (order_id, status) VALUES ($1, $2)',
+            [orderId, 'Pending']
+        );
 
         const io = req.app.get('io');
         if (io) {
             io.emit('new_order', { 
                 order_id: orderId, 
-                customer_name: orderData.customer_name, 
-                priority: orderData.priority_level 
+                customer_name: customer_name || 'Walk-in', 
+                priority: priority_level || 'Standard'
             });
         }
 
-        res.status(201).json({ success: true, order: orderData });
+        res.status(201).json({ success: true, order: { id: orderId, customer_name, status: 'Pending' } });
     } catch (error) {
         console.error(`[ORDER_CREATE_ERROR] Order ID: ${orderId}, Error:`, error);
         res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
@@ -50,18 +38,20 @@ const createOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
     try {
-        let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+        let sql = 'SELECT * FROM orders';
+        let params = [];
 
         if (req.userRole === 'staff') {
-            query = query.eq('assigned_staff_id', req.userId);
+            sql += ' WHERE assigned_staff_id = $1';
+            params.push(req.userId);
         } else if (req.userRole === 'customer') {
-            query = query.eq('customer_id', req.userId);
+            sql += ' WHERE customer_id = $1';
+            params.push(req.userId);
         }
 
-        const { data: orders, error } = await query;
-        if (error) throw error;
-
-        res.json(orders);
+        sql += ' ORDER BY created_at DESC';
+        const result = await pool.query(sql, params);
+        res.json(result.rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -70,17 +60,17 @@ const getOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
     const id = req.params.id;
     try {
-        const { data: order, error: orderErr } = await supabase.from('orders').select('*').eq('id', id).single();
-        if (orderErr || !order) return res.status(404).json({ error: 'Order not found' });
+        const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
+        if (orderResult.rows.length === 0) return res.status(404).json({ error: 'Order not found' });
+        const order = orderResult.rows[0];
 
-        const { data: updates, error: updateErr } = await supabase.from('order_updates').select('*').eq('order_id', id).order('timestamp', { ascending: false });
-        if (updateErr) throw updateErr;
-
+        const updatesResult = await pool.query('SELECT * FROM order_updates WHERE order_id = $1 ORDER BY timestamp DESC', [id]);
+        
         if (req.userRole === 'customer' && order.customer_id !== req.userId) {
             return res.status(403).json({ error: 'Unauthorized to view this order' });
         }
 
-        res.json({ order, updates });
+        res.json({ order, updates: updatesResult.rows });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -91,8 +81,9 @@ const updateOrderStatus = async (req, res) => {
     const orderId = req.params.id;
 
     try {
-        const { data: currentOrder, error: fetchErr } = await supabase.from('orders').select('status, customer_id, customer_name').eq('id', orderId).single();
-        if (fetchErr || !currentOrder) return res.status(404).json({ error: 'Order not found' });
+        const currentResult = await pool.query('SELECT status, customer_id, customer_name FROM orders WHERE id = $1', [orderId]);
+        if (currentResult.rows.length === 0) return res.status(404).json({ error: 'Order not found' });
+        const currentOrder = currentResult.rows[0];
         
         const currentStatus = currentOrder.status;
 
@@ -109,15 +100,13 @@ const updateOrderStatus = async (req, res) => {
             return res.status(400).json({ error: `Invalid transition` });
         }
 
-        const { error: updateErr } = await supabase.from('orders').update({ status }).eq('id', orderId);
-        if (updateErr) throw updateErr;
-        
-        const { error: logErr } = await supabase.from('order_updates').insert({ order_id: orderId, status });
-        if (logErr) throw logErr;
+        await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, orderId]);
+        await pool.query('INSERT INTO order_updates (order_id, status) VALUES ($1, $2)', [orderId, status]);
 
         if (status === 'Completed' || status === 'Ready') {
             if (currentOrder.customer_id) {
-                const { data: userData } = await supabase.from('user').select('email').eq('id', currentOrder.customer_id).single();
+                const userResult = await pool.query('SELECT email FROM "user" WHERE id = $1', [currentOrder.customer_id]);
+                const userData = userResult.rows[0];
                 if (userData?.email) {
                     const { sendOrderReadyEmail } = require('../utils/emailService');
                     sendOrderReadyEmail(userData.email, currentOrder.customer_name, orderId);
@@ -126,7 +115,7 @@ const updateOrderStatus = async (req, res) => {
         }
         
         const io = req.app.get('io');
-        io.emit('status_update', { order_id: orderId, new_status: status });
+        if (io) io.emit('status_update', { order_id: orderId, new_status: status });
 
         res.json({ success: true, message: `Status updated to ${status}` });
     } catch (error) {

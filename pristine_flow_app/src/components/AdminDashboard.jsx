@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 export default function AdminDashboard() {
-  const { orders, stats, logout } = useApp();
+  const { user, orders, stats, logout } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
               />
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-800 overflow-hidden border border-white/10 shrink-0">
-                  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhssDBO0nrmSqSeiTou3rov2ouZQG5Gs5bhB1nMrM23ruJxgzKGpmgvDhmn8dgn_whs6IsczlHcKsCUMsyUWV9SExtoXT1oloHr56NrtlQDFmEo08gOaiapPjdCG39wYiFSBDInLglTXF4gzEC7lTOVEZO0Px48h8SIKewSgEqfIkXuMk4IFvML1vS85h2RVk6yjXnSMerZXjDOlv-iCYN-tw0m5rQ-zXjyZtsyqtZ8fLCZzwehYNhsRuZhfOlX9uOqGFj51NpLrI" alt="User" />
+                  <img src={user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=0D8ABC&color=fff"} alt="User" />
             </div>
             <Link 
               to="/admin/new-order"

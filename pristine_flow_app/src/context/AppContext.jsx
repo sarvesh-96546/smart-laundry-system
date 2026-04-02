@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
-import { supabase } from '../lib/supabase';
 import { authClient, useSession } from '../lib/auth-client';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -165,89 +164,54 @@ export const AppProvider = ({ children }) => {
     steamPress: 50
   });
 
-  // --- Better Auth Session Hook ---
+  // --- Better Auth Session Integration ---
   const { data: sessionData, isPending: isSessionPending } = useSession();
 
   useEffect(() => {
     if (sessionData?.user) {
-        supabase.from('user').select('role, phone_number').eq('id', sessionData.user.id).single().then(({ data: userData }) => {
-            const formattedUser = {
-                id: sessionData.user.id,
-                email: sessionData.user.email,
-                name: sessionData.user.name,
-                role: userData?.role || 'customer',
-                phone_number: userData?.phone_number || null,
-                image: sessionData.user.image
-            };
-            setUser(formattedUser);
-        });
+      setUser({
+        id: sessionData.user.id,
+        email: sessionData.user.email,
+        name: sessionData.user.name,
+        role: sessionData.user.role || 'customer',
+        phone_number: sessionData.user.phone_number || null,
+        image: sessionData.user.image
+      });
+      localStorage.setItem('user', JSON.stringify(sessionData.user));
     } else if (!isSessionPending) {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                supabase.from('user').select('role').eq('id', session.user.id).single().then(({ data: userData }) => {
-                  setUser({
-                    id: session.user.id,
-                    email: session.user.email,
-                    name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Unknown User',
-                    role: userData?.role || 'customer'
-                  });
-                  localStorage.setItem('token', session.access_token);
-                });
-            } else {
-                setUser(null);
-            }
-        });
+      setUser(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
   }, [sessionData, isSessionPending]);
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!sessionData?.user && session) {
-         const { data: userData } = await supabase.from('user').select('role').eq('id', session.user.id).single();
-         setUser({
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Unknown User',
-          role: userData?.role || 'customer'
-        });
-        localStorage.setItem('token', session.access_token);
-      } else if (!sessionData?.user && !session) {
-        setUser(null);
-        localStorage.removeItem('token');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [sessionData]);
-
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const { data, error } = await authClient.signIn.email({ 
+        email, 
+        password,
+        callbackURL: window.location.origin
       });
-      const data = await response.json();
-      if (response.ok) {
-        setUser(data.user);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        toast.success(`Welcome back, ${data.user.name}!`);
-        return data.user;
-      } else {
-        toast.error(data.message || 'Login failed');
+      
+      if (error) {
+        toast.error(error.message || 'Login failed');
         return null;
       }
-    } catch {
+
+      if (data?.user) {
+        toast.success(`Welcome back, ${data.user.name}!`);
+        return data.user;
+      }
+      return null;
+    } catch (err) {
       toast.error('Connection to auth server failed');
+      console.error('Login error:', err);
       return null;
     }
   };
 
   const logout = async () => {
     await authClient.signOut();
-    await supabase.auth.signOut();
-    
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');

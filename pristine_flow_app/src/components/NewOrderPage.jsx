@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/useApp';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 export default function NewOrderPage() {
   const { createOrder, prices } = useApp();
@@ -42,8 +43,9 @@ export default function NewOrderPage() {
         amount: estimatedPrice
       });
       setCreatedOrder(result);
+      toast.success('Order synchronized with system hub');
     } catch (err) {
-      alert(`Sync Failure: ${err.message || 'Protocol rejected by server'}`);
+      toast.error(`Sync Failure: ${err.message || 'Protocol rejected by server'}`);
     } finally {
       setIsSubmitting(false);
     }

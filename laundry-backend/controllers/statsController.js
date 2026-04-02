@@ -1,9 +1,9 @@
-const supabase = require('../config/supabase');
+const { pool } = require('../auth');
 
 const getStats = async (req, res) => {
     try {
-        const { data: orders, error } = await supabase.from('orders').select('*');
-        if (error) throw error;
+        const result = await pool.query('SELECT * FROM orders');
+        const orders = result.rows;
         
         let totalRevenue = 0;
         let inProgress = 0;

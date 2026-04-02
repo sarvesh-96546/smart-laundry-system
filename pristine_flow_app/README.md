@@ -1,16 +1,41 @@
-# React + Vite
+# Pristine Flow - Smart Laundry System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, high-performance laundry management platform built with React, Node.js, and Better Auth.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
+- **Better Auth Integration**: Secure authentication with Google OAuth and Email/Password.
+- **Real-time Monitoring**: Socket.io integration for order status and machinery updates.
+- **Role-based Access**: Admin, Staff, and Customer specific interfaces and permissions.
+- **Premium UI**: Dark-themed, high-contrast design with micro-animations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Tech Stack
+- **Frontend**: React 19, Vite, Recharts, Tailwind CSS.
+- **Backend**: Node.js, Express, Better Auth, Socket.io, Postgres (via `pg`).
+- **Database**: PostgreSQL (hosted on Supabase, accessed via direct pool).
 
-## React Compiler
+## ⚙️ Environment Configuration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Backend (.env)
+```env
+PORT=5002
+TRANSACTION_URL=postgresql://...
+FRONTEND_URL=http://localhost:5173
+BETTER_AUTH_SECRET=your_secret
+BETTER_AUTH_URL=http://localhost:5002/api/auth
+GOOGLE_CLIENT_ID=your_id
+GOOGLE_CLIENT_SECRET=your_secret
+RESEND_API_KEY=your_key
+```
 
-## Expanding the ESLint configuration
+### Frontend (.env)
+```env
+VITE_API_URL=http://localhost:5002
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📜 Development
+1. Install dependencies `npm install`.
+2. Start the backend: `npm run dev` in `/laundry-backend`.
+3. Start the frontend: `npm run dev` in `/pristine_flow_app`.
+
+## 🛡️ Authentication Protocol
+This system uses **Better Auth** as the single source of truth for all identity management. Legacy Supabase Auth has been completely decommissioned.
