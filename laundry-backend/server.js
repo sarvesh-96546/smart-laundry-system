@@ -10,6 +10,7 @@ const userRoutes = require('./routes/userRoutes');
 const { toNodeHandler } = require('better-auth/node');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
