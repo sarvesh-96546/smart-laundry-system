@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
     res.json({ status: "Pristine Flow API Node Live", timestamp: new Date().toISOString() });
 });
 
-app.all("/api/auth/*", toNodeHandler(auth));
+app.use("/api/auth", toNodeHandler(auth));
 
 app.use((req, req_res, next) => {
     next();
