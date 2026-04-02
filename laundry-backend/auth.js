@@ -21,6 +21,9 @@ const auth = betterAuth({
         cookie: {
             sameSite: "none",
             secure: true
+        },
+        account: {
+            skipStateCookieCheck: true
         }
     },
     emailAndPassword: {
