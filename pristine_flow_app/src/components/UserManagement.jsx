@@ -12,9 +12,8 @@ export default function UserManagement() {
 
     const fetchUsers = useCallback(async () => {
         try {
-            const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/api/users`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             const data = await res.json();
             if (res.ok) {
@@ -35,7 +34,6 @@ export default function UserManagement() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token');
         const url = editingId ? `${API_BASE_URL}/api/users/${editingId}` : `${API_BASE_URL}/api/register`;
         const method = editingId ? 'PUT' : 'POST';
 
@@ -43,9 +41,9 @@ export default function UserManagement() {
             const res = await fetch(url, {
                 method,
                 headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             });
             const data = await res.json();
@@ -65,11 +63,10 @@ export default function UserManagement() {
 
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
-        const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (res.ok) {
                 toast.success('User deleted');

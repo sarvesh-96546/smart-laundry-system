@@ -4,11 +4,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendOrderReadyEmail = async (customerEmail, customerName, orderId) => {
     if (!process.env.RESEND_API_KEY) {
-        console.warn('[EMAIL] RESEND_API_KEY not configured. Skipping email notification.');
         return;
     }
     
-    // Resend allows sending from 'onboarding@resend.dev' for free testing
     try {
         const { data, error } = await resend.emails.send({
             from: 'Pristine Flow <onboarding@resend.dev>',
@@ -34,12 +32,9 @@ const sendOrderReadyEmail = async (customerEmail, customerName, orderId) => {
         });
 
         if (error) {
-            console.error('[EMAIL ERROR]', error);
         } else {
-            console.log(`[EMAIL SUCCESS] Ready Notification sent to ${customerEmail}`);
         }
     } catch (err) {
-        console.error('[EMAIL EXCEPTION]', err.message);
     }
 };
 

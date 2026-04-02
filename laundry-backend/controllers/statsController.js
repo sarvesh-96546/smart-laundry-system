@@ -5,6 +5,9 @@ const getStats = async (req, res) => {
         const result = await pool.query('SELECT * FROM orders');
         const orders = result.rows;
         
+        const customerResult = await pool.query('SELECT COUNT(*) FROM "user" WHERE role = $1', ['customer']);
+        const totalCustomers = parseInt(customerResult.rows[0].count);
+
         let totalRevenue = 0;
         let inProgress = 0;
         let ready = 0;
@@ -17,8 +20,11 @@ const getStats = async (req, res) => {
 
         const chartDataMap = {};
         orders.forEach(o => {
-            const date = new Date(o.created_at).toISOString().split('T')[0];
-            chartDataMap[date] = (chartDataMap[date] || 0) + 1;
+            const dateVal = o.created_at || o.createdAt;
+            if (dateVal) {
+                const date = new Date(dateVal).toISOString().split('T')[0];
+                chartDataMap[date] = (chartDataMap[date] || 0) + 1;
+            }
         });
 
         const chart_data = Object.keys(chartDataMap).map(date => ({
@@ -31,6 +37,7 @@ const getStats = async (req, res) => {
             in_progress: inProgress,
             ready,
             total_orders: orders.length,
+            total_customers: totalCustomers,
             chart_data
         });
     } catch (error) {

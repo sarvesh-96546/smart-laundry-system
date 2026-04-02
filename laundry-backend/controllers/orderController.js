@@ -31,7 +31,6 @@ const createOrder = async (req, res) => {
 
         res.status(201).json({ success: true, order: { id: orderId, customer_name, status: 'Pending' } });
     } catch (error) {
-        console.error(`[ORDER_CREATE_ERROR] Order ID: ${orderId}, Error:`, error);
         res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
     }
 };

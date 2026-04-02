@@ -4,6 +4,40 @@ import toast from 'react-hot-toast';
 import { useApp } from '../context/useApp';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
+const AnimatedNumber = ({ value }) => {
+  const [displayValue, setDisplayValue] = React.useState(0);
+  const prevValue = React.useRef(0);
+  
+  React.useEffect(() => {
+    const start = prevValue.current;
+    const end = parseInt(value) || 0;
+    if (start === end) return;
+    
+    const duration = 1500;
+    const startTime = performance.now();
+    
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      const current = Math.floor(start + (end - start) * easeProgress);
+      setDisplayValue(current);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        prevValue.current = end;
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [value]);
+  
+  return <>{displayValue.toLocaleString()}</>;
+};
+
 export default function CustomerHome() {
   const { stats, orders, machines, prices, API_BASE_URL } = useApp();
   const [counts, setCounts] = React.useState({ orders: 0, machines: 0, customers: 0, delivery: 0 });
@@ -12,15 +46,12 @@ export default function CustomerHome() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setCounts({
-        orders: stats.total_orders || 124,
-        machines: machines.length || 12,
-        customers: stats.total_orders ? Math.floor(stats.total_orders * 0.8) : 850,
-        delivery: 24
-      });
-    }, 500);
-    return () => clearTimeout(timer);
+    setCounts({
+      orders: stats.total_orders || 0,
+      machines: machines.length || 0,
+      customers: stats.total_customers || 0,
+      delivery: 24
+    });
   }, [stats, machines]);
 
   const handleTrack = async () => {
@@ -37,7 +68,9 @@ export default function CustomerHome() {
         navigate(`/order/${input.toUpperCase()}`);
       } 
       else if (/^\d{10}$/.test(input)) {
-        const res = await fetch(`${API_BASE_URL}/api/orders/phone/${input}`);
+        const res = await fetch(`${API_BASE_URL}/api/orders/phone/${input}`, {
+          credentials: 'include'
+        });
         const data = await res.json();
         if (data.order_id) {
           navigate(`/order/${data.order_id}`);
@@ -132,7 +165,7 @@ export default function CustomerHome() {
             <div key={i} className="bg-[#121212] p-6 rounded-3xl border border-white/5 hover:border-white/10 transition-all group fade-in" style={{ animationDelay: `${0.1 * i}s` }}>
               <span className="material-symbols-outlined mb-4 block group-hover:scale-110 transition-transform" style={{ color: stat.color }}>{stat.icon}</span>
               <div className="text-4xl font-black tracking-tighter mb-1 tabular-nums">
-                {stat.value.toLocaleString()}
+                <AnimatedNumber value={stat.value} />
               </div>
               <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">{stat.label}</div>
             </div>

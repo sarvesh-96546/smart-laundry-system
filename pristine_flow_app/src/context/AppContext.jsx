@@ -21,40 +21,41 @@ export const AppProvider = ({ children }) => {
   });
 
   const getAuthHeaders = useCallback(() => {
-    const headers = {
+    return {
       'Content-Type': 'application/json'
     };
-    const token = localStorage.getItem('token');
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    return headers;
   }, []);
 
   const fetchCustomers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/customers`);
+      const res = await fetch(`${API_BASE_URL}/api/customers`, {
+        credentials: 'include'
+      });
       const data = await res.json();
       setCustomers(data);
-    } catch (err) {
-      console.error('Fetch customers error:', err);
-    }
+    } catch { /* empty */ }
   }, []);
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/stats`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE_URL}/api/stats`, { 
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (!res.ok) return;
       const data = await res.json();
       if (data && data.revenue !== undefined) {
         setStats(data);
       }
-    } catch (err) {
-      console.error('Stats fetch error:', err);
-    }
+    } catch { /* empty */ }
   }, [getAuthHeaders]);
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE_URL}/api/orders`, { 
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (!res.ok) return;
       const data = await res.json();
       if (!Array.isArray(data)) return;
@@ -66,22 +67,21 @@ export const AppProvider = ({ children }) => {
         status: o.status,
         amount: o.amount
       })));
-    } catch (err) {
-      console.error('Fetch orders error:', err);
-    }
+    } catch { /* empty */ }
   }, [getAuthHeaders]);
 
   const [machines, setMachines] = useState([]);
 
   const fetchMachinery = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/machinery`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE_URL}/api/machinery`, { 
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (!res.ok) return;
       const data = await res.json();
       if (Array.isArray(data)) setMachines(data);
-    } catch (err) {
-      console.error('Fetch machinery error:', err);
-    }
+    } catch { /* empty */ }
   }, [getAuthHeaders]);
 
   const startMachineCycle = async (machineId, orderId, duration = 30) => {
@@ -89,6 +89,7 @@ export const AppProvider = ({ children }) => {
       const res = await fetch(`${API_BASE_URL}/api/machines/${machineId}/start`, {
         method: 'POST',
         headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ order_id: orderId, duration })
       });
       const data = await res.json();
@@ -106,7 +107,8 @@ export const AppProvider = ({ children }) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/machines/${machineId}/stop`, {
         method: 'POST',
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
+        credentials: 'include'
       });
       const data = await res.json();
       if (data.success) {
@@ -123,7 +125,7 @@ export const AppProvider = ({ children }) => {
     const newSocket = io(API_BASE_URL);
     setSocket(newSocket);
 
-    newSocket.on('connected', (data) => console.log('Socket connected:', data));
+    newSocket.on('connected', () => {});
 
     newSocket.on('new_order', (data) => {
       toast.success(`New ${data.priority} Protocol: ${data.order_id}`, {
@@ -152,10 +154,12 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchStats();
-    fetchOrders();
-    fetchCustomers();
     fetchMachinery();
-  }, [fetchStats, fetchOrders, fetchCustomers, fetchMachinery]);
+    if (user) {
+      fetchOrders();
+      fetchCustomers();
+    }
+  }, [user, fetchStats, fetchOrders, fetchCustomers, fetchMachinery]);
 
   const [prices, setPrices] = useState({
     base: 40,
@@ -164,7 +168,6 @@ export const AppProvider = ({ children }) => {
     steamPress: 50
   });
 
-  // --- Better Auth Session Integration ---
   const { data: sessionData, isPending: isSessionPending } = useSession();
 
   useEffect(() => {
@@ -181,7 +184,6 @@ export const AppProvider = ({ children }) => {
     } else if (!isSessionPending) {
       setUser(null);
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
     }
   }, [sessionData, isSessionPending]);
 
@@ -203,9 +205,8 @@ export const AppProvider = ({ children }) => {
         return data.user;
       }
       return null;
-    } catch (err) {
+    } catch {
       toast.error('Connection to auth server failed');
-      console.error('Login error:', err);
       return null;
     }
   };
@@ -214,7 +215,6 @@ export const AppProvider = ({ children }) => {
     await authClient.signOut();
     setUser(null);
     localStorage.removeItem('user');
-    localStorage.removeItem('token');
     toast.success('System disconnected cleanly');
   };
 
@@ -237,7 +237,6 @@ export const AppProvider = ({ children }) => {
       throw new Error(data.error || data.message || 'Failed to create order');
     } catch (err) {
       toast.error(err.message || 'Create order error');
-      console.error('Order Error:', err);
       throw err;
     }
   };

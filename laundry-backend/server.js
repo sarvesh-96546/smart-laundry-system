@@ -18,44 +18,33 @@ const io = new Server(server, {
     }
 });
 
-// Middleware
 app.use(cors({
     origin: ["http://localhost:5173", "http://localhost:3000", "https://pristine-flow.vercel.app"],
     credentials: true
 }));
 app.use(express.json());
 
-// Health Check
 app.get("/", (req, res) => {
     res.json({ status: "Pristine Flow API Node Live", timestamp: new Date().toISOString() });
 });
 
-// Better Auth Middleware
 app.all("/api/auth/*path", toNodeHandler(auth));
 
-// Request Logger
 app.use((req, req_res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
-// Attach io to app for use in controllers
 app.set('io', io);
 
-// Socket.io Connection Logic
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-    socket.emit('connected', { message: 'Welcome to Pristine Flow Auth Server' });
+    socket.emit('connected', { message: 'Welcome To Pristine Flow Auth Server' });
     
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
     });
 });
 
-// Routes
 app.use('/api', userRoutes);
 
 const PORT = process.env.PORT || 5002;
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });

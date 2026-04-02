@@ -7,11 +7,30 @@ services:
     buildCommand: npm install
     startCommand: npm start
     envVars:
-      - key: SUPABASE_URL
+      - key: PORT
+        value: 5002
+      - key: DATABASE_URL
         sync: false
-      - key: SUPABASE_ANON_KEY
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: FRONTEND_URL
         sync: false
+
+  - type: static
+    name: pristine-flow-frontend
+    env: static
+    rootDir: pristine_flow_app
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+

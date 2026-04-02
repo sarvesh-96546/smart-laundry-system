@@ -18,7 +18,8 @@ export default function OrderDetails() {
   const fetchOrder = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
+        credentials: 'include'
       });
       const data = await response.json();
       if (response.ok) {
@@ -54,6 +55,7 @@ export default function OrderDetails() {
       const res = await fetch(`${API_BASE_URL}/api/orders/${id}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
       });
       const data = await res.json();
