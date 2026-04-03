@@ -1,9 +1,19 @@
 const { betterAuth } = require("better-auth");
 const { Pool } = require("pg");
 
+const isProduction = process.env.NODE_ENV === "production";
+const connectionString = isProduction ? process.env.DATABASE_URL : process.env.DIRECT_URL;
+
 const pool = new Pool({
-    connectionString: process.env.TRANSACTION_URL,
-    ssl: { rejectUnauthorized: false }
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+    max: 20,
+    idleTimeoutMillis: 10000, 
+    connectionTimeoutMillis: 5000,
+});
+
+pool.on('error', (err) => {
+    console.error('Telemetric Failure: Database connection lost. Automatic recovery protocol engaged.', err);
 });
 
 const auth = betterAuth({
@@ -45,7 +55,20 @@ const auth = betterAuth({
                 required: false
             }
         }
-    }
+    },
+    databaseHooks: {
+        user: {
+            create: {
+                after: async (user) => {
+                    const { sendWelcomeEmail } = require("./utils/emailService");
+                    try {
+                        await sendWelcomeEmail(user.email, user.name);
+                    } catch (error) {
+                    }
+                },
+            },
+        },
+    },
 });
 
 module.exports = { auth, pool };

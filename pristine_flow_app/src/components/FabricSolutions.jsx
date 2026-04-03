@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
 
 export default function FabricSolutions() {
   const solutions = [
@@ -33,24 +34,11 @@ export default function FabricSolutions() {
     <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] overflow-hidden relative">
       {/* Background Glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-tertiary/10 blur-[150px] rounded-full animate-pulse" style={{ animationDelay: '-3s' }}></div>
+        <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full"></div>
+        <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-tertiary/10 blur-[150px] rounded-full"></div>
       </div>
 
-      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center text-sm font-bold">
-          <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-8 h-8 bg-linear-to-br from-primary to-tertiary rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
-              <span className="material-symbols-outlined text-black text-sm">water_drop</span>
-            </div>
-            <span className="text-lg font-black tracking-tighter uppercase">PRISTINE FLOW</span>
-          </Link>
-          <div className="flex gap-8 text-slate-500 uppercase tracking-widest text-[10px]">
-            <Link to="/pricing" className="hover:text-primary transition-colors">Pricing Matrix</Link>
-            <Link to="/machinery" className="hover:text-primary transition-colors">Infrastructure</Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="pt-40 pb-24 px-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000">
         <div className="text-center mb-24 max-w-3xl mx-auto">

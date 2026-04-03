@@ -110,28 +110,34 @@ export default function NewOrderModal({ isOpen, onClose }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Service Type</label>
-                        <select 
-                            value={formData.service_type}
-                            onChange={(e) => setFormData({...formData, service_type: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm appearance-none"
-                        >
-                            <option value="Wash & Fold">Wash & Fold</option>
-                            <option value="Dry Clean">Dry Cleaning</option>
-                            <option value="Ironing">Ironing Only</option>
-                            <option value="Steam Press">Premium Steam</option>
-                        </select>
+                        <div className="relative">
+                            <select 
+                                value={formData.service_type}
+                                onChange={(e) => setFormData({...formData, service_type: e.target.value})}
+                                className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-primary/30 transition-all text-sm appearance-none cursor-pointer pr-10"
+                            >
+                                <option value="Wash & Fold">Wash & Fold</option>
+                                <option value="Dry Clean">Dry Cleaning</option>
+                                <option value="Ironing">Ironing Only</option>
+                                <option value="Steam Press">Premium Steam</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-lg">expand_more</span>
+                        </div>
                     </div>
                     <div>
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Priority Level</label>
-                        <select 
-                            value={formData.priority_level || 'Standard'}
-                            onChange={(e) => setFormData({...formData, priority_level: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#ffd700]/30 transition-all text-sm appearance-none font-bold"
-                        >
-                            <option value="Standard">Standard</option>
-                            <option value="Express">Express (+ ₹49)</option>
-                            <option value="VIP">VIP Priority (+ ₹99)</option>
-                        </select>
+                        <div className="relative">
+                            <select 
+                                value={formData.priority_level || 'Standard'}
+                                onChange={(e) => setFormData({...formData, priority_level: e.target.value})}
+                                className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-[#ffd700]/30 transition-all text-sm appearance-none font-bold cursor-pointer pr-10"
+                            >
+                                <option value="Standard">Standard</option>
+                                <option value="Express">Express (+ ₹49)</option>
+                                <option value="VIP">VIP Priority (+ ₹99)</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#ffd700] text-lg">expand_more</span>
+                        </div>
                     </div>
                 </div>
 

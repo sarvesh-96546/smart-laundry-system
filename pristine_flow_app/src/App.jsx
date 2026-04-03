@@ -20,6 +20,7 @@ import TermsOfService from './components/TermsOfService';
 import DataProtocol from './components/DataProtocol';
 import SupportIntelligence from './components/SupportIntelligence';
 import FabricSolutions from './components/FabricSolutions';
+import ProtocolExpansion from './components/ProtocolExpansion';
 import ErrorProtocol from './components/ErrorProtocol';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -36,30 +37,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 function NavigationWrapper({ children }) {
-  const { user, logout } = useApp();
   return (
     <>
-      <div className="fixed top-0 right-0 z-9999 bg-[#111]/90 text-white p-2 flex items-center gap-4 border border-white/10 rounded-bl-xl text-xs backdrop-blur-md shadow-lg">
-        {user ? (
-          <>
-            <span className="text-primary font-semibold">[{user.role.toUpperCase()}] {user.name}</span>
-            <button onClick={logout} className="text-red-400 hover:text-red-300 font-bold">Logout</button>
-            <div className="h-4 w-px bg-white/10 mx-1"></div>
-            <Link to="/" className="text-slate-400 hover:text-white">Home</Link>
-            {user.role === 'admin' && (
-              <>
-                <Link to="/admin" className="text-primary hover:text-white">Dashboard</Link>
-                <Link to="/admin/users" className="text-primary hover:text-white">Users</Link>
-              </>
-            )}
-            {(user.role === 'admin' || user.role === 'staff') && (
-              <Link to="/staff" className="text-yellow-400 hover:text-white">Staff Panel</Link>
-            )}
-          </>
-        ) : (
-          <Link to="/login" className="text-primary hover:text-white px-2">System Login</Link>
-        )}
-      </div>
       {children}
     </>
   );
@@ -100,6 +79,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyCipher />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/data-protocol" element={<DataProtocol />} />
+            <Route path="/membership" element={<ProtocolExpansion />} />
             <Route path="/support" element={<SupportIntelligence />} />
             <Route path="/solutions" element={<FabricSolutions />} />
             <Route path="*" element={<ErrorProtocol />} />

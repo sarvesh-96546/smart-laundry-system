@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/useApp';
+import Navbar from './Navbar';
 
 export default function SupportIntelligence() {
   const { API_BASE_URL } = useApp();
@@ -35,24 +36,11 @@ export default function SupportIntelligence() {
     <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] overflow-hidden relative">
       {/* Background Glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-tertiary/10 blur-[150px] rounded-full animate-pulse" style={{ animationDelay: '-3s' }}></div>
+        <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full"></div>
+        <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-tertiary/10 blur-[150px] rounded-full"></div>
       </div>
 
-      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-8 h-8 bg-linear-to-br from-primary to-tertiary rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
-              <span className="material-symbols-outlined text-black text-sm">water_drop</span>
-            </div>
-            <span className="text-lg font-black tracking-tighter">PRISTINE FLOW</span>
-          </Link>
-          <Link to="/" className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-primary transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">home</span>
-            Core Nexus
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="pt-40 pb-24 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 animate-in fade-in zoom-in-95 duration-1000">
         <div className="space-y-10">
@@ -125,18 +113,21 @@ export default function SupportIntelligence() {
                 />
               </div>
             </div>
-            <div>
+            <div className="relative">
               <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-2 ml-1 font-bold">Inquiry Sphere</label>
-              <select 
-                className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl py-4 px-5 text-sm outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
-                value={formData.subject}
-                onChange={(e) => setFormData({...formData, subject: e.target.value})}
-              >
-                <option value="Technical Protocol">Technical Protocol Deviation</option>
-                <option value="Billing Synchronization">Billing Synchronization Query</option>
-                <option value="Fabric Anomaly">Fabric Anomaly Report</option>
-                <option value="General Uplink">General Nexus Uplink</option>
-              </select>
+              <div className="relative">
+                <select 
+                  className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl py-4 px-5 text-sm outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                >
+                  <option value="Technical Protocol">Technical Protocol Deviation</option>
+                  <option value="Billing Synchronization">Billing Synchronization Query</option>
+                  <option value="Fabric Anomaly">Fabric Anomaly Report</option>
+                  <option value="General Uplink">General Nexus Uplink</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-lg">expand_more</span>
+              </div>
             </div>
             <div>
               <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-2 ml-1 font-bold">Transmission Body</label>

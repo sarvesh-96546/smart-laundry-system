@@ -104,23 +104,39 @@ export default function OrderDetails() {
   const { order, updates } = orderData;
   const currentStageIndex = STAGES.indexOf(order.status);
 
+  const getETA = () => {
+    if (order.status === 'Delivered' || order.status === 'Completed') return 'READY';
+    const baseWait = order.priority_level === 'VIP' ? 1 : order.priority_level === 'Express' ? 2 : 4;
+    return `${baseWait - Math.max(0, currentStageIndex)} Hours`;
+  };
+
+  const synchronizedUpdates = [...updates];
+  if (synchronizedUpdates.length > 0 && synchronizedUpdates[0].status !== order.status) {
+    synchronizedUpdates.unshift({
+      status: order.status,
+      timestamp: new Date().toISOString()
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] pb-20 animate-in fade-in duration-1000">
       <div className="max-w-4xl mx-auto pt-24 px-6 md:px-0">
         <div className="flex justify-between items-center mb-8">
-          <Link to={user ? "/admin" : "/"} className="text-slate-500 hover:text-primary flex items-center gap-2 group transition-colors text-sm font-bold">
+          <Link to={user ? (user.role === 'customer' ? "/" : "/admin") : "/"} className="text-slate-500 hover:text-primary flex items-center gap-2 group transition-colors text-sm font-bold">
             <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
-            {user ? "Return to Command Center" : "Back to Home"}
+            {user ? (user.role === 'customer' ? "Return to Core Nexus" : "Return to Command Center") : "Back to Home"}
           </Link>
           
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setIsInvoiceOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-black transition-all shadow-[0_0_15px_rgba(143,245,255,0.1)]"
-            >
-              <span className="material-symbols-outlined text-sm">receipt_long</span>
-              Invoice Protocol
-            </button>
+             {(order.status === 'Completed' || order.status === 'Delivered' || (user && user.role !== 'customer')) && (
+                <button 
+                  onClick={() => setIsInvoiceOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-black transition-all shadow-[0_0_15px_rgba(143,245,255,0.1)]"
+                >
+                  <span className="material-symbols-outlined text-sm">receipt_long</span>
+                  Invoice Protocol
+                </button>
+             )}
             <button 
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
@@ -196,13 +212,13 @@ export default function OrderDetails() {
                   <div>
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Payment</p>
                     <p className={`font-bold text-sm ${order.payment_status === 'Paid' ? 'text-green-400' : 'text-yellow-400'}`}>
-                      {order.payment_status}
+                      {order.payment_status || 'Unpaid'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">ETA</p>
-                    <p className="font-bold text-sm text-primary">
-                      {order.status === 'Delivered' ? 'Completed' : '2-4 Hours'}
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">ETA STATUS</p>
+                    <p className="font-bold text-sm">
+                      {getETA()}
                     </p>
                   </div>
                 </div>
@@ -244,13 +260,13 @@ export default function OrderDetails() {
                 Event Logs
               </h2>
               <div className="space-y-8 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-px before:bg-white/5">
-                {updates.map((update, idx) => (
+                {synchronizedUpdates.map((update, idx) => (
                   <div key={idx} className="relative pl-12 animate-in slide-in-from-left duration-500">
                     <div className={`absolute left-0 top-1 w-9 h-9 rounded-full flex items-center justify-center z-10 border ${
                       idx === 0 ? 'bg-primary border-primary text-black' : 'bg-background border-white/5 text-slate-600'
                     }`}>
                       <span className="material-symbols-outlined text-sm">
-                        {update.status === 'Received' ? 'inventory_2' : 
+                        {update.status === 'Pending' ? 'inventory_2' : 
                          update.status === 'Washing' ? 'local_laundry_service' : 
                          update.status === 'Drying' ? 'air' : 
                          update.status === 'Ironing' ? 'iron' : 'check_circle'}

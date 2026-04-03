@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/useApp';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import Navbar from './Navbar';
 
 const AnimatedNumber = ({ value }) => {
   const [displayValue, setDisplayValue] = React.useState(0);
@@ -39,7 +40,41 @@ const AnimatedNumber = ({ value }) => {
 };
 
 export default function CustomerHome() {
-  const { stats, orders, machines, prices, API_BASE_URL } = useApp();
+  const { user, stats, orders, machines, prices, API_BASE_URL } = useApp();
+  
+  const featuredOrder = React.useMemo(() => {
+    if (!orders || orders.length === 0) return null;
+    
+    if (user?.role === 'customer') {
+      return orders[0];
+    } else if (user?.role === 'admin' || user?.role === 'staff') {
+      return orders[0];
+    }
+    return null;
+  }, [user, orders]);
+
+  const getStepActive = (stepIndex, status) => {
+    const sequence = ['Pending', 'Washing', 'Drying', 'Ironing', 'Completed', 'Delivered'];
+    const currentIndex = sequence.indexOf(status);
+    if (currentIndex === -1) return stepIndex === 0;
+
+    // Map database indices to the 5 visual steps
+    // 0 (Pending) -> Step 0 (Received)
+    // 1 (Washing) -> Step 1 (Washing)
+    // 2 (Drying) -> Step 2 (Drying)
+    // 3 (Ironing) -> Step 3 (Ironing)
+    // 4+ (Completed/Delivered) -> Step 4 (Ready)
+    
+    if (currentIndex >= 4) return stepIndex <= 4;
+    return stepIndex <= currentIndex;
+  };
+
+  const getStepHighlight = (stepIndex, status) => {
+    const sequence = ['Pending', 'Washing', 'Drying', 'Ironing', 'Completed', 'Delivered'];
+    const currentIndex = sequence.indexOf(status);
+    if (currentIndex >= 4) return stepIndex === 4;
+    return stepIndex === currentIndex;
+  };
   const [counts, setCounts] = React.useState({ orders: 0, machines: 0, customers: 0, delivery: 0 });
   const [trackInput, setTrackInput] = React.useState('');
   const [isTracking, setIsTracking] = React.useState(false);
@@ -92,46 +127,25 @@ export default function CustomerHome() {
       <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] overflow-x-hidden selection:bg-primary selection:text-black">
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-float"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 blur-[120px] rounded-full animate-float" style={{ animationDelay: '-3s' }}></div>
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 blur-[120px] rounded-full"></div>
         </div>
 
         {/* Navigation */}
-        <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div className="flex items-center gap-2 group cursor-pointer">
-              <div className="w-10 h-10 bg-linear-to-br from-primary to-tertiary rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
-                <span className="material-symbols-outlined text-black font-bold">water_drop</span>
-              </div>
-              <span className="text-xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-white to-white/60">PRISTINE FLOW</span>
-            </div>
-            <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
-              <Link to="/pricing" className="text-slate-400 hover:text-primary transition-colors relative group">
-                Services
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-              </Link>
-              <a href="#activity" className="text-slate-400 hover:text-primary transition-colors relative group">
-                Live Feed
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-              </a>
-              <Link to="/login" className="bg-white/5 border border-white/10 px-6 py-2.5 rounded-full text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-300">Staff Portal</Link>
-            </div>
-          </div>
-        </nav>
+        <Navbar />
 
         {/* Hero Section */}
         <section className="pt-40 pb-20 px-6 max-w-7xl mx-auto relative">
           <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-6">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              SYSTEM ONLINE • PORTAL V4.2
+              SYSTEM ONLINE
             </div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 fade-in">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
               Next-Gen <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-tertiary to-primary bg-size-[200%_auto] animate-gradient">
+              <span className="text-primary">
                 Fabric Care
               </span>
             </h1>
@@ -172,46 +186,87 @@ export default function CustomerHome() {
           ))}
         </section>
 
-        {/* Real-Time Order Tracker Demo */}
+        {/* Dynamic Order Operations Pipeline */}
         <section className="py-20 px-6 max-w-7xl mx-auto" id="tracking-section">
           <div className="bg-[#121212] rounded-[3rem] p-8 md:p-12 border border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8">
               <div className="w-24 h-24 bg-primary/5 blur-3xl rounded-full"></div>
             </div>
             
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
               <div>
-                <h2 className="text-4xl font-black tracking-tighter mb-2">Live Pipeline Demo</h2>
-                <p className="text-slate-500 font-bold">Experience our ultra-transparent tracking system.</p>
+                <h2 className="text-4xl font-black tracking-tighter mb-2">
+                  {user ? (featuredOrder ? 'Order Operations Pipeline' : 'Operational Readiness') : 'Live Pipeline Demo'}
+                </h2>
+                <p className="text-slate-500 font-bold">
+                  {user 
+                    ? (featuredOrder ? `Real-time telemetry for your active protocol.` : 'No active protocols detected. Create an order to track in real-time.') 
+                    : 'Experience our ultra-transparent tracking system.'}
+                </p>
               </div>
-              <div className="bg-white/5 px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                <span className="text-sm font-black tracking-widest text-primary uppercase">Order #PF-9928</span>
-              </div>
+              
+              {(featuredOrder || !user) && (
+                <div className="bg-white/5 px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${featuredOrder ? 'bg-primary' : 'bg-slate-500'}`}></div>
+                  <span className="text-sm font-black tracking-widest text-primary uppercase">
+                    {featuredOrder ? `Order #${featuredOrder.id}` : 'Order #PF-DEMO'}
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="relative">
-              {/* Pipeline Line */}
-              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 hidden md:block"></div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
-                {[
-                  { stage: 'Received', icon: 'inventory_2', time: '10:00 AM' },
-                  { stage: 'Washing', icon: 'waves', time: '10:45 AM', active: true },
-                  { stage: 'Drying', icon: 'air', time: 'Pending' },
-                  { stage: 'Ironing', icon: 'iron', time: 'Pending' },
-                  { stage: 'Ready', icon: 'verified', time: 'Pending' },
-                ].map((step, i) => (
-                  <div key={i} className="flex flex-col items-center relative z-10 group/step">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 ${step.active ? 'bg-primary text-black shadow-[0_0_30px_rgba(143,245,255,0.4)] scale-110' : 'bg-[#1a1a1a] text-slate-600 border border-white/5'}`}>
-                      <span className={`material-symbols-outlined text-2xl ${step.active ? 'animate-spin-slow' : ''}`}>{step.icon}</span>
-                    </div>
-                    <span className={`font-black tracking-tight mb-1 ${step.active ? 'text-primary' : 'text-slate-400'}`}>{step.stage}</span>
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-600">{step.time}</span>
-                  </div>
-                ))}
+            {user && !featuredOrder ? (
+              <div className="py-12 flex flex-col items-center text-center relative z-10">
+                <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/5">
+                  <span className="material-symbols-outlined text-slate-600 text-4xl">inventory</span>
+                </div>
+                <h3 className="text-xl font-bold mb-4 italic text-slate-400">System Idle: No Orders Found</h3>
+                <Link to="/admin/new-order" className="bg-primary/10 text-primary px-8 py-3 rounded-2xl font-bold hover:bg-primary hover:text-black transition-all">
+                  Initialize New Protocol
+                </Link>
               </div>
-            </div>
+            ) : (
+              <div className="relative">
+                {/* Pipeline Line */}
+                <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 hidden md:block"></div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
+                  {[
+                    { stage: 'Received', icon: 'inventory_2', dbStatus: 'Pending' },
+                    { stage: 'Washing', icon: 'waves', dbStatus: 'Washing' },
+                    { stage: 'Drying', icon: 'air', dbStatus: 'Drying' },
+                    { stage: 'Ironing', icon: 'iron', dbStatus: 'Ironing' },
+                    { stage: 'Ready', icon: 'verified', dbStatus: 'Completed' },
+                  ].map((step, i) => {
+                    const status = featuredOrder?.status || 'Washing';
+                    const isActive = getStepActive(i, status);
+                    const isHighlighted = getStepHighlight(i, status);
+                    
+                    return (
+                      <div key={i} className="flex flex-col items-center relative z-10 group/step">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 
+                          ${isHighlighted ? 'bg-primary text-black shadow-lg scale-110' : 
+                            isActive ? 'bg-primary/20 text-primary border border-primary/20' : 
+                            'bg-[#1a1a1a] text-slate-600 border border-white/5'}`}
+                        >
+                          <span className="material-symbols-outlined text-2xl">{step.icon}</span>
+                        </div>
+                        <span className={`font-black tracking-tight mb-1 
+                          ${isHighlighted ? 'text-primary' : 
+                            isActive ? 'text-primary/70' : 
+                            'text-slate-400'}`}
+                        >
+                          {step.stage}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-slate-600">
+                          {isHighlighted ? 'Active' : isActive ? 'Completed' : 'Pending'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -242,7 +297,13 @@ export default function CustomerHome() {
                 </div>
               ))}
             </div>
-            <button className="mt-8 w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm hover:bg-white/10 transition-all">View All Events</button>
+            <Link 
+              to={user?.role === 'admin' ? "/admin" : user?.role === 'staff' ? "/staff" : "/login"}
+              className="mt-8 w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2 group"
+            >
+              View All Events
+              <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </Link>
           </div>
 
           {/* Service Cards */}

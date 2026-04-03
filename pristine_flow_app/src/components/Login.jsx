@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useApp } from '../context/useApp';
 import { authClient } from '../lib/auth-client';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
-  const { login } = useApp();
-  const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
     try {
@@ -21,123 +15,61 @@ export default function Login() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const loggedInUser = await login(email, password);
-    if (loggedInUser) {
-      if (loggedInUser.role === 'admin') {
-        navigate('/admin');
-      } else if (loggedInUser.role === 'staff') {
-        navigate('/staff');
-      } else {
-        navigate('/');
-      }
-    } else {
-      setError('Invalid system credentials or network error');
-    }
-  };
-
   return (
     <>
-      <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background Decorations */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 rounded-full blur-[120px]"></div>
+      <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Subtle, Static Background Accents */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 rounded-full blur-[120px]"></div>
+        </div>
 
-        <div className="w-full max-w-[440px] relative z-10 animate-fade-in">
-          {/* Logo Section */}
-          <div className="flex flex-col items-center mb-10 text-center">
-            <div className="w-16 h-16 bg-[#1a1a1a] border border-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-2xl relative group">
-              <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="material-symbols-outlined text-primary text-3xl relative z-10">water_drop</span>
+        <div className="w-full max-w-[440px] relative z-10 animate-in fade-in duration-700">
+          
+          {/* Brand Section */}
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="w-16 h-16 bg-[#1a1a1a] border border-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+              <span className="material-symbols-outlined text-primary text-3xl">water_drop</span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Pristine Flow</h1>
-            <p className="text-slate-400">System Authentication Interface</p>
+            <p className="text-slate-400 text-sm font-medium tracking-wide">System Authentication Interface</p>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-[#121212]/80 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 md:p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
+          {/* Authentication Card */}
+          <div className="bg-[#121212] border border-white/10 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden text-center">
+            <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary/30 to-transparent"></div>
             
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && <div className="text-red-400 text-sm text-center bg-red-400/10 p-2 rounded-lg">{error}</div>}
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Access Protocol</label>
-                <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl group-focus-within:text-primary transition-colors">alternate_email</span>
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                    placeholder="Enter system bypass ID"
-                  />
-                </div>
-              </div>
+            {error && <div className="text-red-400 text-xs font-bold bg-red-400/10 border border-red-400/20 p-3 rounded-xl mb-8">{error}</div>}
 
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Security Key</label>
-                <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl group-focus-within:text-primary transition-colors">lock</span>
-                  <input 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono"
-                    placeholder="••••••••••••"
-                  />
-                  <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
-                    <span className="material-symbols-outlined text-xl">visibility</span>
-                  </button>
-                </div>
-                <div className="flex justify-end mt-3">
-                  <a href="#" className="text-xs text-slate-400 hover:text-primary transition-colors">Reset Access?</a>
-                </div>
-              </div>
+            <h2 className="text-xl font-bold mb-4 tracking-tight">Identity Verification</h2>
+            <p className="text-slate-500 text-sm leading-relaxed mb-10">
+              Access to the command hub is restricted. Please authenticate using your corporate Google identity to continue.
+            </p>
 
-              <div className="pt-2">
-                <button type="submit" className="w-full bg-primary hover:bg-secondary text-background font-bold py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(143,245,255,0.3)] active:scale-[0.98] flex items-center justify-center gap-2">
-                  Initiate Uplink
-                  <span className="material-symbols-outlined text-xl">login</span>
-                </button>
-              </div>
-            </form>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/10"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#121212] text-slate-500">Or bypass via</span>
-                </div>
-              </div>
-
-              <button 
+            <button 
                 onClick={handleGoogleLogin}
                 type="button" 
-                className="mt-6 w-full bg-white hover:bg-slate-100 text-black font-semibold py-4 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                Continue with Google
-              </button>
-            </div>
+                className="w-full h-16 bg-white hover:bg-slate-100 text-black font-bold rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+            >
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 transition-transform group-hover:scale-110" />
+                <span className="text-base">Continue with Google</span>
+            </button>
 
-            <div className="mt-8 pt-6 border-t border-white/5 text-center">
-              <p className="text-sm text-slate-500">
-                Unauthorized access is logged. <a href="#" className="text-primary hover:underline font-medium">Request ID</a>
-              </p>
+            <div className="mt-10 pt-8 border-t border-white/5">
+                <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+                    Unauthorized access is logged and prosecuted
+                </p>
             </div>
           </div>
 
-          {/* Footer Status */}
-          <div className="mt-10 flex items-center justify-between text-[10px] uppercase tracking-[2px] text-slate-600 font-bold px-2">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-              Node: 0x8892-ALPHA
+          {/* Status Label */}
+          <div className="mt-10 flex justify-center h-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/5">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-[9px] font-bold uppercase tracking-[2px] text-slate-500">Node: 0x8892-ALPHA</span>
             </div>
-            <div>Auth V4.2.0-SECURE</div>
           </div>
+
         </div>
       </div>
     </>

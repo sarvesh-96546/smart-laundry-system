@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/useApp';
 import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
 
 export default function Pricing() {
   const { prices, setPrices, user } = useApp();
@@ -13,25 +14,14 @@ export default function Pricing() {
   };
 
   return (
-    <>
-      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
-        <div className="flex justify-between items-center px-8 h-20 w-full">
-          <div className="text-2xl font-bold tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-cyan-300 to-blue-500 font-headline">
-            Pristine Flow
-          </div>
-          <div className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-tight">
-            <Link className="text-neutral-400 hover:text-cyan-300 transition-all font-bold uppercase tracking-widest text-[10px]" to="/">Home</Link>
-            {user && (user.role === 'admin' || user.role === 'staff') && (
-                <>
-                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/admin">Dashboard</Link>
-                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/customers">Customers</Link>
-                    <Link className="text-neutral-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/machinery">Machinery</Link>
-                </>
-            )}
-            <Link className="text-cyan-400 hover:text-cyan-300 transition-all uppercase tracking-widest text-[10px]" to="/pricing">Pricing</Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] overflow-hidden selection:bg-primary selection:text-black">
+      {/* Subtle, Static Background Accents */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 rounded-full blur-[120px]"></div>
+      </div>
+
+      <Navbar />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto bg-background text-white">
         <header className="mb-16 flex justify-between items-end">
@@ -147,12 +137,12 @@ export default function Pricing() {
               <h2 className="text-4xl font-extrabold mb-4 tracking-tight">The Pristine Membership</h2>
               <p className="text-black/80 text-lg">Unlock 20% off all services, priority scheduling, and complimentary same-day delivery.</p>
             </div>
-            <button className="bg-black text-white px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-95">
+            <Link to="/membership" className="bg-black text-white px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-95">
               Become a Member
-            </button>
+            </Link>
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 }

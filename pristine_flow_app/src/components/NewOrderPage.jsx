@@ -119,28 +119,34 @@ export default function NewOrderPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Service Node</label>
-                        <select 
-                            value={formData.service_type}
-                            onChange={(e) => setFormData({...formData, service_type: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm appearance-none cursor-pointer"
-                        >
-                            <option value="Wash & Fold">Wash & Fold</option>
-                            <option value="Dry Clean">Dry Cleaning</option>
-                            <option value="Ironing">Ironing Only</option>
-                            <option value="Steam Press">Premium Steam</option>
-                        </select>
+                        <div className="relative">
+                            <select 
+                                value={formData.service_type}
+                                onChange={(e) => setFormData({...formData, service_type: e.target.value})}
+                                className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-primary/30 transition-all font-bold text-sm appearance-none cursor-pointer pr-12"
+                            >
+                                <option value="Wash & Fold">Wash & Fold</option>
+                                <option value="Dry Clean">Dry Cleaning</option>
+                                <option value="Ironing">Ironing Only</option>
+                                <option value="Steam Press">Premium Steam</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">expand_more</span>
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Priority Protocol</label>
-                        <select 
-                            value={formData.priority_level}
-                            onChange={(e) => setFormData({...formData, priority_level: e.target.value})}
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#ffd700]/30 transition-all font-bold text-sm appearance-none cursor-pointer text-[#ffd700]"
-                        >
-                            <option value="Standard">Standard Execution</option>
-                            <option value="Express">Express (+ ₹49)</option>
-                            <option value="VIP">VIP Priority (+ ₹99)</option>
-                        </select>
+                        <div className="relative">
+                            <select 
+                                value={formData.priority_level}
+                                onChange={(e) => setFormData({...formData, priority_level: e.target.value})}
+                                className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-[#ffd700]/30 transition-all font-bold text-sm appearance-none cursor-pointer text-[#ffd700] pr-12"
+                            >
+                                <option value="Standard">Standard Execution</option>
+                                <option value="Express">Express (+ ₹49)</option>
+                                <option value="VIP">VIP Priority (+ ₹99)</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#ffd700]">expand_more</span>
+                        </div>
                     </div>
                 </div>
 

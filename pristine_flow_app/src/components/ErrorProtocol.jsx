@@ -1,18 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
 
 export default function ErrorProtocol() {
   return (
     <div className="min-h-screen bg-background text-white font-['Plus_Jakarta_Sans'] flex flex-col items-center justify-center p-6 text-center overflow-hidden relative">
       {/* Glitchy Background Effects */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-red-500/20 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/20 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '-1s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-red-500/20 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/20 blur-[120px] rounded-full"></div>
       </div>
 
+      <Navbar />
+
       <div className="relative z-10 space-y-8 animate-in fade-in zoom-in-95 duration-1000">
-        <div className="w-24 h-24 bg-[#121212] rounded-4xl border border-red-500/30 flex items-center justify-center mx-auto mb-12 shadow-[0_0_50px_rgba(239,68,68,0.2)]">
-          <span className="material-symbols-outlined text-red-500 text-5xl animate-pulse">warning</span>
+        <div className="w-24 h-24 bg-[#121212] rounded-4xl border border-red-500/30 flex items-center justify-center mx-auto mb-12 shadow-lg">
+          <span className="material-symbols-outlined text-red-500 text-5xl">warning</span>
         </div>
 
         <div>

@@ -19,14 +19,6 @@ export default function Footer() {
           <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
             Orchestrating the evolution of fabric care through molecular science and digital precision. We are the alchemists of your wardrobe.
           </p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-white/5">
-              <span className="material-symbols-outlined text-xl">share</span>
-            </a>
-            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-white/5">
-              <span className="material-symbols-outlined text-xl">alternate_email</span>
-            </a>
-          </div>
         </div>
 
         {/* Navigation Protocol */}

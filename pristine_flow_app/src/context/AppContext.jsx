@@ -154,10 +154,11 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchStats();
-    fetchMachinery();
     if (user) {
-      fetchOrders();
+    fetchOrders();
+    if (user && (user.role === 'admin' || user.role === 'staff')) {
       fetchCustomers();
+    }
     }
   }, [user, fetchStats, fetchOrders, fetchCustomers, fetchMachinery]);
 

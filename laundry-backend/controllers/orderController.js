@@ -1,4 +1,10 @@
 const { pool } = require('../auth');
+const { 
+    sendOrderConfirmationEmail, 
+    sendOrderStatusUpdateEmail, 
+    sendOrderReadyEmail, 
+    sendOrderDeliveredEmail 
+} = require('../utils/emailService');
 
 const statusSequence = ['Pending', 'Washing', 'Drying', 'Ironing', 'Completed', 'Delivered'];
 
@@ -19,6 +25,14 @@ const createOrder = async (req, res) => {
             'INSERT INTO order_updates (order_id, status) VALUES ($1, $2)',
             [orderId, 'Pending']
         );
+
+        if (customer_id) {
+            const userResult = await pool.query('SELECT email FROM "user" WHERE id = $1', [customer_id]);
+            const userData = userResult.rows[0];
+            if (userData?.email) {
+                sendOrderConfirmationEmail(userData.email, customer_name || 'Valued Customer', orderId, service_type);
+            }
+        }
 
         const io = req.app.get('io');
         if (io) {
@@ -110,13 +124,17 @@ const updateOrderStatus = async (req, res) => {
         await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, orderId]);
         await pool.query('INSERT INTO order_updates (order_id, status) VALUES ($1, $2)', [orderId, status]);
 
-        if (status === 'Completed' || status === 'Ready') {
-            if (currentOrder.customer_id) {
-                const userResult = await pool.query('SELECT email FROM "user" WHERE id = $1', [currentOrder.customer_id]);
-                const userData = userResult.rows[0];
-                if (userData?.email) {
-                    const { sendOrderReadyEmail } = require('../utils/emailService');
+        if (currentOrder.customer_id) {
+            const userResult = await pool.query('SELECT email FROM "user" WHERE id = $1', [currentOrder.customer_id]);
+            const userData = userResult.rows[0];
+            
+            if (userData?.email) {
+                if (status === 'Completed' || status === 'Ready') {
                     sendOrderReadyEmail(userData.email, currentOrder.customer_name, orderId);
+                } else if (status === 'Delivered') {
+                    sendOrderDeliveredEmail(userData.email, currentOrder.customer_name, orderId);
+                } else if (['Washing', 'Drying', 'Ironing'].includes(status)) {
+                    sendOrderStatusUpdateEmail(userData.email, currentOrder.customer_name, orderId, status);
                 }
             }
         }
